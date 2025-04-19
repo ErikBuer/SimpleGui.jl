@@ -1,26 +1,43 @@
+export handle_click, handle_mouse_enter, handle_mouse_leave, render
+
 mutable struct Container <: GuiComponent
     x::Float32
     y::Float32
     width::Float32
     height::Float32
     color::Tuple{Float32,Float32,Float32,Float32} # RGBA
-    children::Vector{GuiComponent} # Child components (e.g., other Containers, Buttons, etc.)
-    on_click::Function # Callback function for click events
+    children::Vector{GuiComponent}        # Child components
+    event_handlers::Dict{Symbol,Function} # Event handlers
+end
+
+# Constructor with default empty event handlers
+function Container(x, y, width, height, color, children=Vector{GuiComponent}())
+    return Container(x, y, width, height, color, children, Dict{Symbol,Function}())
 end
 
 function handle_click(container::Container, mouse_x::Float64, mouse_y::Float64, button::GLFW.MouseButton, action::GLFW.Action)
-    # Check if the mouse click is within the container's bounds
     if mouse_x >= container.x && mouse_x <= container.x + container.width &&
        mouse_y >= container.y && mouse_y <= container.y + container.height &&
        action == GLFW.PRESS && button == GLFW.MOUSE_BUTTON_LEFT
-        # Execute the on_click callback if defined
-        if container.on_click !== nothing
-            container.on_click()
-        end
+        dispatch_event(container, :on_click)
     end
 end
 
-function render_component(container::Container)
+function handle_mouse_enter(container::Container, mouse_x::Float64, mouse_y::Float64)
+    if mouse_x >= container.x && mouse_x <= container.x + container.width &&
+       mouse_y >= container.y && mouse_y <= container.y + container.height
+        dispatch_event(container, :on_mouse_enter)
+    end
+end
+
+function handle_mouse_leave(container::Container, mouse_x::Float64, mouse_y::Float64)
+    if !(mouse_x >= container.x && mouse_x <= container.x + container.width &&
+         mouse_y >= container.y && mouse_y <= container.y + container.height)
+        dispatch_event(container, :on_mouse_leave)
+    end
+end
+
+function render(container::Container)
     # Define the vertices of the rectangle
     vertex_positions = Point{2,Float32}[
         (container.x, container.y),  # Bottom-left
