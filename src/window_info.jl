@@ -23,5 +23,8 @@ function initialize_window(window_name::String="Simple GUI", resolution::Tuple{I
     # Register the framebuffer size callback
     GLFW.SetFramebufferSizeCallback(window, framebuffer_size_callback)
 
+    # Register the mouse button callback
+    GLFW.SetMouseButtonCallback(window, mouse_button_callback)
+
     return window
 end

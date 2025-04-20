@@ -1,6 +1,3 @@
-using ModernGL, GLAbstraction, GLFW # OpenGL dependencies
-const GLA = GLAbstraction
-
 include("SimpleGui.jl")
 using .SimpleGui
 
@@ -8,11 +5,6 @@ using .SimpleGui
 function main()
     # Initialize the window
     window = initialize_window()
-    GLA.set_context!(window)
-    GLFW.MakeContextCurrent(window)
-
-    # Register the mouse button callback
-    GLFW.SetMouseButtonCallback(window, mouse_button_callback)
 
     # Initialize shaders
     SimpleGui.initialize_shaders()
