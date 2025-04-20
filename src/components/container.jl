@@ -6,35 +6,55 @@ mutable struct Container <: GuiComponent
     width::Float32
     height::Float32
     color::Tuple{Float32,Float32,Float32,Float32} # RGBA
-    children::Vector{GuiComponent}        # Child components
-    event_handlers::Dict{Symbol,Function} # Event handlers
+    children::Vector{GuiComponent}  # Child components
+    state::ComponentState           # Shared state
 end
 
-# Constructor with default empty event handlers
-function Container(x, y, width, height, color, children=Vector{GuiComponent}())
-    return Container(x, y, width, height, color, children, Dict{Symbol,Function}())
-end
-
-function handle_click(container::Container, mouse_x::Float64, mouse_y::Float64, button::GLFW.MouseButton, action::GLFW.Action)
+function handle_click(container::Container, mouse_x::Float64, mouse_y::Float64, button::GLFW.MouseButton, is_clicked::Bool)
+    state = get_state(container)
     if mouse_x >= container.x && mouse_x <= container.x + container.width &&
-       mouse_y >= container.y && mouse_y <= container.y + container.height &&
-       action == GLFW.PRESS && button == GLFW.MOUSE_BUTTON_LEFT
-        dispatch_event(container, :on_click)
+       mouse_y >= container.y && mouse_y <= container.y + container.height
+        if is_clicked == GLFW.PRESS && button == GLFW.MOUSE_BUTTON_LEFT
+            if !state.is_clicked
+                state.is_clicked = true
+                dispatch_event(container, :on_click)
+            end
+        elseif !is_clicked
+            state.is_clicked = false
+        end
     end
 end
 
 function handle_mouse_enter(container::Container, mouse_x::Float64, mouse_y::Float64)
+    state = get_state(container)
     if mouse_x >= container.x && mouse_x <= container.x + container.width &&
        mouse_y >= container.y && mouse_y <= container.y + container.height
-        dispatch_event(container, :on_mouse_enter)
+        if !state.is_hovered
+            state.is_hovered = true
+            dispatch_event(container, :on_mouse_enter)
+        end
     end
 end
 
 function handle_mouse_leave(container::Container, mouse_x::Float64, mouse_y::Float64)
+    state = get_state(container)
     if !(mouse_x >= container.x && mouse_x <= container.x + container.width &&
          mouse_y >= container.y && mouse_y <= container.y + container.height)
-        dispatch_event(container, :on_mouse_leave)
+        if state.is_hovered
+            state.is_hovered = false
+            dispatch_event(container, :on_mouse_leave)
+        end
     end
+end
+
+# Constructor with default empty event handlers
+function Container(x, y, width, height, color, children=Vector{GuiComponent}())
+    return Container(x, y, width, height, color, children, ComponentState())
+end
+
+# Implement get_state for Container
+function get_state(container::Container)::ComponentState
+    return container.state
 end
 
 function render(container::Container)
