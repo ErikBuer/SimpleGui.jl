@@ -20,39 +20,41 @@ mutable struct Container <: GuiComponent
     style::ContainerStyle
 end
 
-function handle_click(container::Container, mouse_x::Float64, mouse_y::Float64, button::GLFW.MouseButton, is_clicked::Bool)
+function handle_click(container::Container, mouse_state::MouseState)
     state = get_state(container)
-    if mouse_x >= container.x && mouse_x <= container.x + container.width &&
-       mouse_y >= container.y && mouse_y <= container.y + container.height
-        if is_clicked == GLFW.PRESS && button == GLFW.MOUSE_BUTTON_LEFT
+
+    if inside_rectangular_component(container, mouse_state)
+        if mouse_state.button_state[GLFW.MOUSE_BUTTON_LEFT] == IsPressed
             if !state.is_clicked
                 state.is_clicked = true
                 dispatch_event(container, :on_click)
             end
-        elseif !is_clicked
+        elseif state.is_clicked
             state.is_clicked = false
         end
     end
 end
 
-function handle_mouse_enter(container::Container, mouse_x::Float64, mouse_y::Float64)
+function handle_mouse_enter(container::Container, mouse_state::MouseState)
     state = get_state(container)
-    if mouse_x >= container.x && mouse_x <= container.x + container.width &&
-       mouse_y >= container.y && mouse_y <= container.y + container.height
+    if inside_rectangular_component(container, mouse_state)
         if !state.is_hovered
             state.is_hovered = true
-            dispatch_event(container, :on_mouse_enter)
+            dispatch_event(container, :on_mouse_enter, mouse_state)
+        end
+    else
+        if state.is_hovered
+            state.is_hovered = false
         end
     end
 end
 
-function handle_mouse_leave(container::Container, mouse_x::Float64, mouse_y::Float64)
+function handle_mouse_leave(container::Container, mouse_state::MouseState)
     state = get_state(container)
-    if !(mouse_x >= container.x && mouse_x <= container.x + container.width &&
-         mouse_y >= container.y && mouse_y <= container.y + container.height)
+    if !(inside_rectangular_component(container, mouse_state))
         if state.is_hovered
             state.is_hovered = false
-            dispatch_event(container, :on_mouse_leave)
+            dispatch_event(container, :on_mouse_leave, mouse_state)
         end
     end
 end
@@ -60,33 +62,6 @@ end
 # Constructor with default empty event handlers
 function Container(x, y, width, height, children=Vector{GuiComponent}())
     return Container(x, y, width, height, children, ComponentState(), ContainerStyle())
-end
-
-# Implement get_state for Container
-function get_state(container::Container)::ComponentState
-    return container.state
-end
-
-
-function generate_rectangle(x, y, width, height, color)
-    # Define the vertices for the rectangle in counterclockwise order
-    vertices = Point{2,Float32}[
-        Point{2,Float32}(x, y),                     # Bottom-left
-        Point{2,Float32}(x + width, y),            # Bottom-right
-        Point{2,Float32}(x + width, y + height),   # Top-right
-        Point{2,Float32}(x, y + height)            # Top-left
-    ]
-
-    # Define the colors for each vertex
-    colors = [Vec(color...) for _ in 1:4]
-
-    # Define the elements (two triangles forming the rectangle)
-    elements = NgonFace{3,UInt32}[
-        (0, 1, 2),  # First triangle: bottom-left, bottom-right, top-right
-        (2, 3, 0)   # Second triangle: top-right, top-left, bottom-left
-    ]
-
-    return vertices, colors, elements
 end
 
 function render(container::Container)

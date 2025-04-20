@@ -1,71 +1,53 @@
-mutable struct ComponentState
-    is_hovered::Bool
-    is_clicked::Bool
-    event_handlers::Dict{Symbol,Function}
-end
-
-# Constructor with default values
-function ComponentState()
-    return ComponentState(false, false, Dict{Symbol,Function}())
-end
-
 abstract type GuiComponent end
 
-# Implement get_state for Container
+include("components/component_state.jl")
+include("components/utilities.jl")
+
+
 function get_state(component::GuiComponent)::ComponentState
-    error("get_state must be implemented by all GuiComponent subtypes")
+    return component.state
 end
 
-# Generic event dispatcher
-function dispatch_event(component::GuiComponent, event::Symbol, args...)
-    state = get_state(component)
-    if haskey(state.event_handlers, event)
-        state.event_handlers[event](args...)
-    end
+"""    register_component(component::GuiComponent)
+
+Register a GUI component to the global list of components.
+This function is used to keep track of all components (on the top level) that need to be rendered and updated.
+"""
+function register_component(component::GuiComponent)
+    push!(components, component)
 end
 
-const MouseEvent = Symbol[
-    :on_click,
-    :on_context_menu,
-    :on_dbl_click,
-    :on_mouse_down,
-    :on_mouse_enter,
-    :on_mouse_leave,
-    :on_mouse_move,
-    :on_mouse_out,
-    :on_mouse_over,
-    :on_mouse_up
-]
+
 
 # Placeholder functions for components
-function handle_click(component::GuiComponent, mouse_x::Float64, mouse_y::Float64, button, action)
+function handle_click(component::GuiComponent, mouse_state::MouseState)
     error("handle_click is not implemented for $(typeof(component))")
 end
-function handle_context_menu(component::GuiComponent, mouse_x::Float64, mouse_y::Float64)
+function handle_context_menu(component::GuiComponent, mouse_state::MouseState)
     error("handle_context_menu is not implemented for $(typeof(component))")
 end
-function handle_dbl_click(component::GuiComponent, mouse_x::Float64, mouse_y::Float64)
+function handle_dbl_click(component::GuiComponent, mouse_state::MouseState)
     error("handle_dbl_click is not implemented for $(typeof(component))")
 end
-function handle_mouse_enter(component::GuiComponent, mouse_x::Float64, mouse_y::Float64)
+function handle_mouse_enter(component::GuiComponent, mouse_state::MouseState)
     error("handle_mouse_enter is not implemented for $(typeof(component))")
 end
-function handle_mouse_leave(component::GuiComponent, mouse_x::Float64, mouse_y::Float64)
+function handle_mouse_leave(component::GuiComponent, mouse_state::MouseState)
     error("handle_mouse_leave is not implemented for $(typeof(component))")
 end
-function handle_mouse_move(component::GuiComponent, mouse_x::Float64, mouse_y::Float64)
+function handle_mouse_move(component::GuiComponent, mouse_state::MouseState)
     error("handle_mouse_move is not implemented for $(typeof(component))")
 end
-function handle_mouse_out(component::GuiComponent, mouse_x::Float64, mouse_y::Float64)
+function handle_mouse_out(component::GuiComponent, mouse_state::MouseState)
     error("handle_mouse_out is not implemented for $(typeof(component))")
 end
-function handle_mouse_over(component::GuiComponent, mouse_x::Float64, mouse_y::Float64)
+function handle_mouse_over(component::GuiComponent, mouse_state::MouseState)
     error("handle_mouse_over is not implemented for $(typeof(component))")
 end
-function handle_mouse_down(component::GuiComponent, mouse_x::Float64, mouse_y::Float64, button)
+function handle_mouse_down(component::GuiComponent, mouse_state::MouseState)
     error("handle_mouse_down is not implemented for $(typeof(component))")
 end
-function handle_mouse_up(component::GuiComponent, mouse_x::Float64, mouse_y::Float64, button)
+function handle_mouse_up(component::GuiComponent, mouse_state::MouseState)
     error("handle_mouse_up is not implemented for $(typeof(component))")
 end
 function render(component::GuiComponent)
