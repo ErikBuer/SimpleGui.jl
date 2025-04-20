@@ -4,7 +4,9 @@ include("components/component_state.jl")
 include("components/utilities.jl")
 
 include("components/layout.jl")
-export Alignment, AlignmentType, AlignCenter, AlignLeft, AlignRight, AlignTop, AlignBottom
+export Layout
+export LayoutRule, StackVertical, StackHorizontal, AlignCenter
+export SizeRule, FixedSize, FillParentVertical, FillParentHorizontal, FillParentArea
 
 
 """    register_component(component::GuiComponent)
