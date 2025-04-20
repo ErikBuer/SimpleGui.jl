@@ -6,7 +6,7 @@ mutable struct ContainerStyle
 end
 
 # Default style for Container
-function ContainerStyle(; background_color=(0.8, 0.8, 0.8, 1.0), border_color=(0.5, 0.5, 0.8, 1.0), border_width_px=4, padding_px=0.0)
+function ContainerStyle(; background_color=(0.8, 0.8, 0.8, 1.0), border_color=(0.5, 0.5, 0.5, 1.0), border_width_px=2, padding_px=0.0)
     return ContainerStyle(background_color, border_color, border_width_px, padding_px)
 end
 
@@ -16,8 +16,14 @@ mutable struct Container <: GuiComponent
     width::Float32
     height::Float32
     children::Vector{GuiComponent}  # Child components
-    state::ComponentState           # Shared state
+    state::ComponentState
     style::ContainerStyle
+    layout::Layout
+end
+
+# Constructor with default empty event handlers
+function Container(x, y, width, height, children=Vector{GuiComponent}())
+    return Container(x, y, width, height, children, ComponentState(), ContainerStyle(), Layout())
 end
 
 function handle_click(container::Container, mouse_state::MouseState)
@@ -59,12 +65,10 @@ function handle_mouse_leave(container::Container, mouse_state::MouseState)
     end
 end
 
-# Constructor with default empty event handlers
-function Container(x, y, width, height, children=Vector{GuiComponent}())
-    return Container(x, y, width, height, children, ComponentState(), ContainerStyle())
-end
-
 function render(container::Container)
+    # Apply layout to position child components
+    apply_layout(container)
+
     # Fetch the window dimensions from the global window_info
     window_width_px = window_info.width_px
     window_height_px = window_info.height_px
@@ -121,4 +125,9 @@ function render(container::Container)
     GLA.draw(vao)
     GLA.unbind(vao)
     GLA.unbind(prog[])
+
+    # Render child components
+    for child in container.children
+        render(child)
+    end
 end

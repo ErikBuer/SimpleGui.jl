@@ -3,10 +3,9 @@ abstract type GuiComponent end
 include("components/component_state.jl")
 include("components/utilities.jl")
 
+include("components/layout.jl")
+export Alignment, AlignmentType, AlignCenter, AlignLeft, AlignRight, AlignTop, AlignBottom
 
-function get_state(component::GuiComponent)::ComponentState
-    return component.state
-end
 
 """    register_component(component::GuiComponent)
 

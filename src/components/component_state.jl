@@ -11,3 +11,7 @@ Default constructor for ComponentState.
 function ComponentState()
     return ComponentState(false, false, Dict{Symbol,Function}(), Dict{Symbol,Bool}())
 end
+
+function get_state(component::GuiComponent)::ComponentState
+    return component.state
+end

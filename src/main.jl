@@ -16,6 +16,16 @@ function main()
     register_event(container, :on_click, () -> println("Container clicked!"))
     register_event(container, :on_mouse_enter, (mouse_state) -> println("Mouse entered at ($(mouse_state.x), $(mouse_state.y))"))
 
+
+    # Create child components
+    child1 = Container(0.0, 0.0, 0.4, 0.4)
+    child2 = Container(0.0, 0.0, 0.2, 0.2)
+
+    # Add children to the parent
+    push!(container.children, child1)
+    push!(container.children, child2)
+
+
     # Register the container
     register_component(container)
 
