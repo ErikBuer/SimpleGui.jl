@@ -1,5 +1,3 @@
-export handle_click, handle_mouse_enter, handle_mouse_leave, render
-
 mutable struct ContainerStyle
     background_color::Tuple{Float32,Float32,Float32,Float32}
     border_color::Tuple{Float32,Float32,Float32,Float32}

@@ -4,32 +4,6 @@ const GLA = GLAbstraction
 include("SimpleGui.jl")
 using .SimpleGui
 
-"""
-Enum representing the state of a mouse button.
-
-- `IsPressed`: The button is currently pressed.
-- `IsReleased`: The button is currently released.
-"""
-@enum ButtonState IsPressed IsReleased
-
-# Declare mouse_state as a global variable
-global mouse_state
-
-function mouse_button_callback(window, button, action, mods)
-    if action == GLFW.PRESS
-        mouse_state.button_state[button] = IsPressed
-    elseif action == GLFW.RELEASE
-        mouse_state.button_state[button] = IsReleased
-    end
-end
-
-# Shared state for mouse input
-mutable struct MouseState
-    button_state::Dict{GLFW.MouseButton,ButtonState}  # Tracks the state of each button
-    x::Float64                     # Mouse X position
-    y::Float64                     # Mouse Y position
-end
-
 
 function main()
     window = initialize_window()
@@ -40,11 +14,7 @@ function main()
     GLFW.SetMouseButtonCallback(window, mouse_button_callback)
 
     # Initialize shaders
-    initialize_shaders()
-
-    # Initialize the mouse state
-    global mouse_state
-    mouse_state = MouseState(Dict(GLFW.MOUSE_BUTTON_LEFT => IsReleased, GLFW.MOUSE_BUTTON_RIGHT => IsReleased), 0.0, 0.0)
+    SimpleGui.initialize_shaders()
 
     # Create a container
     container = Container(-0.5, -0.5, 1.0, 1.0)

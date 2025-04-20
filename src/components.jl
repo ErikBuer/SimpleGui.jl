@@ -72,7 +72,5 @@ function render(component::GuiComponent)
     error("render is not implemented for $(typeof(component))")
 end
 
-export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up, render
-
 include("components/container.jl")
 export Container

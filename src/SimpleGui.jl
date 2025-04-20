@@ -11,41 +11,22 @@ export use_state
 include("shader.jl")
 export initialize_shaders, prog
 
+include("mouse.jl")
+export mouse_state, mouse_button_callback, ButtonState, IsPressed, IsReleased, MouseState
+
+include("window_info.jl")
+export initialize_window
+
 include("components.jl")
+export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up, render
 
 
-mutable struct WindowInfo
-    width_px::Integer
-    height_px::Integer
-    handle::Union{GLFW.Window,Nothing}
-end
 
 # Create a global instance of the window info
 global window_info = WindowInfo(800, 600, nothing)
 
-function framebuffer_size_callback(window, width_px, height_px)
-    global window_info
-    window_info.width_px = width_px
-    window_info.height_px = height_px
-end
-
-function initialize_window(window_name::String="Simple GUI")
-    window = GLFW.Window(name=window_name, resolution=(800, 600))
-    GLA.set_context!(window)
-    GLFW.MakeContextCurrent(window)
-
-    # Update the global window info
-    global window_info
-    window_info.handle = window
-    window_info.width_px, window_info.height_px = GLFW.GetFramebufferSize(window)
-
-    # Register the framebuffer size callback
-    GLFW.SetFramebufferSizeCallback(window, framebuffer_size_callback)
-
-    return window
-end
-
-export initialize_window
+global mouse_state
+mouse_state = MouseState(Dict(GLFW.MOUSE_BUTTON_LEFT => IsReleased, GLFW.MOUSE_BUTTON_RIGHT => IsReleased), 0.0, 0.0)
 
 
 end
