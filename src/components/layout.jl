@@ -1,6 +1,10 @@
 @enum LayoutRule StackVertical StackHorizontal AlignCenter
 @enum SizeRule FixedSize FillParentVertical FillParentHorizontal FillParentArea
 
+"""
+Layout struct for GUI components.
+This struct defines the layout properties for a GUI component, including the layout rule, size rule, and padding.
+"""
 mutable struct Layout
     layout_rule::LayoutRule
     size_rule::SizeRule
