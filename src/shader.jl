@@ -1,30 +1,25 @@
 # Vertex and Fragment Shaders
 const vertex_shader = GLA.vert"""
-#version 150
+#version 330 core
+layout(location = 0) in vec2 position;
+layout(location = 1) in vec4 color;
 
-in vec2 position;
-in vec4 color;
+out vec4 v_color;
 
-out vec4 Color;
-
-void main()
-{
-    Color = color;
+void main() {
     gl_Position = vec4(position, 0.0, 1.0);
+    v_color = color;
 }
 """
 
 const fragment_shader = GLA.frag"""
-#version 150
+#version 330 core
+    in vec4 v_color;
+    out vec4 FragColor;
 
-in vec4 Color;
-
-out vec4 outColor;
-
-void main()
-{
-    outColor = Color;
-}
+    void main() {
+        FragColor = v_color;
+    }
 """
 
 

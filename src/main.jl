@@ -30,8 +30,9 @@ mutable struct MouseState
     y::Float64                     # Mouse Y position
 end
 
+
 function main()
-    window = GLFW.Window(name="GUI Playground", resolution=(800, 600))
+    window = initialize_window()
     GLA.set_context!(window)
     GLFW.MakeContextCurrent(window)
 
@@ -45,11 +46,8 @@ function main()
     global mouse_state
     mouse_state = MouseState(Dict(GLFW.MOUSE_BUTTON_LEFT => IsReleased, GLFW.MOUSE_BUTTON_RIGHT => IsReleased), 0.0, 0.0)
 
-    # Create a state for the container's color
-    color_state, set_color = use_state((0.2, 0.6, 0.8, 1.0))
-
     # Create a container
-    container = Container(-0.5, -0.5, 1.0, 1.0, (0.2, 0.6, 0.8, 1.0))
+    container = Container(-0.5, -0.5, 1.0, 1.0)
     container.state.event_handlers[:on_click] = () -> println("Container clicked!")
     container.state.event_handlers[:on_mouse_enter] = () -> println("Mouse entered container!")
 
