@@ -43,3 +43,31 @@ function inside_rectangular_component(component::AbstractGuiComponent, mouse_sta
     return (x >= component.x && x <= component.x + component.width &&
             y >= component.y && y <= component.y + component.height)
 end
+
+"""
+    dc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
+
+Convert NDC scale to pixels.
+
+```jldoctest
+julia> ndc_to_px(0.5, 800)
+200.0
+```
+"""
+function ndc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
+    return (dim / 2) * dim_px
+end
+
+"""
+    px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
+
+Convert pixel to NDC scale.
+
+```jldoctest
+julia> px_to_ndc(200.0, 800)
+0.5
+```
+"""
+function px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
+    return (px / dim_px) * 2
+end

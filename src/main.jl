@@ -9,9 +9,18 @@ function main()
     # Initialize shaders
     SimpleGui.initialize_shaders()
 
-
+    # TODO Currently a primary component is needed, covering the whole window
     main_container = SimpleGui._Container(-1.0, -1.0, 2.0, 2.0)
-    main_container.layout.size_rule = FillParentArea
+
+    top_bar = DockedContainer()
+    top_bar.layout.docking = DockTop
+    push!(main_container.children, top_bar)
+
+
+    side_bar = DockedContainer()
+    side_bar.layout.docking = DockLeft
+    push!(main_container.children, side_bar)
+
 
     # Create a container
     container = SimpleGui._Container(-0.5, -0.5, 1.0, 1.0)
@@ -34,7 +43,7 @@ function main()
 
     push!(main_container.children, container)
 
-    # Register the container
+    # Register the containers
     register_component(main_container)
 
     # Run the GUI

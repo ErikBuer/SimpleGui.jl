@@ -9,3 +9,6 @@ export ScrollArea
 
 include("components/linear_layout.jl")
 export VerticalLayout, HorizontalLayout
+
+include("components/docked_container.jl")
+export DockedContainer

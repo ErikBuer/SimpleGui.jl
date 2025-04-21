@@ -36,34 +36,6 @@ end
 
 
 """
-    dc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
-
-Convert NDC scale to pixels.
-
-```jldoctest
-julia> ndc_to_px(0.5, 800)
-200.0
-```
-"""
-function ndc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
-    return (dim / 2) * dim_px
-end
-
-"""
-    px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
-
-Convert pixel to NDC scale.
-
-```jldoctest
-julia> px_to_ndc(200.0, 800)
-0.5
-```
-"""
-function px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
-    return (px / dim_px) * 2
-end
-
-"""
     apply_layout(component::AbstractGuiComponent)
 
 Apply layout to a GUI component and its children.
@@ -80,15 +52,57 @@ function apply_layout(component::AbstractGuiComponent)
     parent_height = component.height
     layout = component.layout
 
-    # Convert padding from pixels to NDC
-    padding_x = (layout.padding_px / window_info.width_px) * 2  # Horizontal padding in NDC
-    padding_y = (layout.padding_px / window_info.height_px) * 2 # Vertical padding in NDC
-
     # Track the current position for stacking
     current_x = parent_x
     current_y = parent_y + parent_height
 
     for child in component.children
+
+        if isa(child, AbstractDockedComponent)
+
+            # Apply docking layout and adjust parent dimensions for following children
+            if child.layout.docking == DockTop
+                size_ndc = px_to_ndc(child.layout.size_px, window_info.height_px)
+
+                child.x = parent_x
+                child.y = parent_y + parent_height - size_ndc
+                child.width = parent_width
+                child.height = size_ndc
+
+                parent_height -= size_ndc
+            elseif child.layout.docking == DockBottom
+                size_ndc = px_to_ndc(child.layout.size_px, window_info.height_px)
+
+                child.x = parent_x
+                child.y = parent_y
+                child.width = parent_width
+                child.height = size_ndc
+
+                parent_height -= size_ndc
+                parent_y += size_ndc
+            elseif child.layout.docking == DockLeft
+                size_ndc = px_to_ndc(child.layout.size_px, window_info.width_px)
+
+                child.x = parent_x
+                child.y = parent_y
+                child.width = size_ndc
+                child.height = parent_height
+
+                parent_width -= size_ndc
+                parent_x += size_ndc
+            elseif child.layout.docking == DockRight
+                size_ndc = px_to_ndc(child.layout.size_px, window_info.width_px)
+
+                child.x = parent_x + parent_width - size_ndc
+                child.y = parent_y
+                child.width = size_ndc
+                child.height = parent_height
+
+                parent_width -= size_ndc
+            end
+
+            continue  # Skip to the next iteration for docked components
+        end
 
         child_padding_x = px_to_ndc(child.layout.padding_px, window_info.width_px)
         child_padding_y = px_to_ndc(child.layout.padding_px, window_info.height_px)

@@ -13,7 +13,7 @@ mutable struct DockedContainer <: AbstractDockedComponent
 end
 
 function DockedContainer()
-    return DockedContainer(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ContainerStyle(), DockedLayout())
+    return DockedContainer(0.0, 0.0, 0.0, 0.0, AbstractGuiComponent[], ComponentState(), ContainerStyle(), DockedLayout())
 end
 
 function render(container::DockedContainer)
@@ -30,26 +30,15 @@ function render(container::DockedContainer)
     border_width_px = container.style.border_width_px
 
     # Convert border width from pixels to NDC
-    border_width_x = (border_width_px / window_width_px) * 2
-    border_width_y = (border_width_px / window_height_px) * 2
-
-    # Convert padding from pixels to NDC
-    padding_px = container.layout.padding_px
-    padding_x = (padding_px / window_width_px) * 2  # Horizontal padding in NDC
-    padding_y = (padding_px / window_height_px) * 2 # Vertical padding in NDC
-
-    # Adjust container dimensions for padding
-    padded_x = container.x + padding_x
-    padded_y = container.y + padding_y
-    padded_width = container.width - 2 * padding_x
-    padded_height = container.height - 2 * padding_y
+    border_width_x = px_to_ndc(border_width_px, window_width_px)
+    border_width_y = px_to_ndc(border_width_px, window_height_px)
 
     # Draw the border if border_width > 0
     if border_width_px > 0.0
         # Generate vertices for the border rectangle
         border_positions, border_colors, border_elements = generate_rectangle(
-            padded_x - border_width_x, padded_y - border_width_y,
-            padded_width + 2 * border_width_x, padded_height + 2 * border_width_y,
+            container.x - border_width_x, container.y - border_width_y,
+            container.width + 2 * border_width_x, container.height + 2 * border_width_y,
             border_color
         )
 
@@ -67,7 +56,7 @@ function render(container::DockedContainer)
 
     # Generate vertices for the main rectangle
     vertex_positions, vertex_colors, elements = generate_rectangle(
-        padded_x, padded_y, padded_width, padded_height, bg_color
+        container.x, container.y, container.width, container.height, bg_color
     )
 
     # Generate buffers and vertex array for the main rectangle

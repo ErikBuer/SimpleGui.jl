@@ -14,6 +14,7 @@ include("gui_component/layout.jl")
 export AlignedLayout, DockedLayout
 export Alignement, StackVertical, StackHorizontal, AlignCenter
 export SizeRule, FillParentVertical, FillParentHorizontal, FillParentArea
+export Docking, DockTop, DockBottom, DockLeft, DockRight
 
 
 """

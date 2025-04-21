@@ -90,13 +90,13 @@ function render(container::Container)
     border_width_px = container.style.border_width_px
 
     # Convert border width from pixels to NDC
-    border_width_x = (border_width_px / window_width_px) * 2
-    border_width_y = (border_width_px / window_height_px) * 2
+    border_width_x = px_to_ndc(border_width_px, window_width_px)
+    border_width_y = px_to_ndc(border_width_px, window_height_px)
 
     # Convert padding from pixels to NDC
     padding_px = container.layout.padding_px
-    padding_x = (padding_px / window_width_px) * 2  # Horizontal padding in NDC
-    padding_y = (padding_px / window_height_px) * 2 # Vertical padding in NDC
+    padding_x = px_to_ndc(padding_px, window_width_px)
+    padding_y = px_to_ndc(padding_px, window_height_px)
 
     # Adjust container dimensions for padding
     padded_x = container.x + padding_x
