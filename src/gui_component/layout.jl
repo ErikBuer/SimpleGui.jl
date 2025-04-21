@@ -1,29 +1,48 @@
-@enum LayoutRule StackVertical StackHorizontal AlignCenter
+@enum Alignement StackVertical StackHorizontal AlignCenter                  # TODO change to just alignements, stacking is something else
 @enum SizeRule FillParentVertical FillParentHorizontal FillParentArea
-# TODO @enum DockRule DockTop DockBottom DockLeft DockRight DockFill
+@enum Docking DockTop DockBottom DockLeft DockRight
+
+@enum Axis begin
+    Vertical
+    Horizontal
+end
 
 """
 Layout struct for GUI components.
 This struct defines the layout properties for a GUI component, including the layout rule, size rule, and padding_px.
 """
-mutable struct Layout
-    layout_rule::LayoutRule
+mutable struct AlignedLayout
+    alignement::Alignement
     size_rule::SizeRule
     padding_px::Float32     # TODO fix
 end
 
-function Layout(; layout_rule=StackVertical, size_rule=FillParentHorizontal, padding_px=0.0)
-    return Layout(layout_rule, size_rule, padding_px)
+function AlignedLayout(; alignement=StackVertical, size_rule=FillParentHorizontal, padding_px=0.0)
+    return AlignedLayout(alignement, size_rule, padding_px)
 end
 
+mutable struct DockedLayout
+    docking::Docking        # Docking position (DockTop, DockBottom, DockLeft, DockRight)
+    padding_px::Float32     # TODO fix
+    size_px::Float32        # Fixed size (width for vertical docking, height for horizontal docking)
+end
+
+function DockedLayout(; docking=DockLeft, padding_px=0.0, size_px=300.0)
+    return DockedLayout(docking, padding_px, size_px)
+end
+
+
 """
+    apply_layout(component::AbstractGuiComponent)
+
 Apply layout to a GUI component and its children.
-This function applies the layout properties defined in the component's layout field.
+This function calculates and applies the layout to components.
+The `render` function then uses the positions and sizes calculated by this function.
 
 The default layout method.
 Certain components may have their own layout methods, which will override this one.
 """
-function apply_layout(component::GuiComponent)
+function apply_layout(component::AbstractGuiComponent)
     parent_x = component.x
     parent_y = component.y
     parent_width = component.width
@@ -50,26 +69,21 @@ function apply_layout(component::GuiComponent)
             child.height = parent_height - 2 * padding_y
         end
 
-        # Position the child based on layout_rule
-        if layout.layout_rule == StackVertical
+        # Position the child based on alignement
+        if layout.alignement == StackVertical
             # Stack children vertically
             child.x = parent_x + padding_x
             current_y -= child.height + padding_y
             child.y = current_y
-        elseif layout.layout_rule == StackHorizontal
+        elseif layout.alignement == StackHorizontal
             # Stack children horizontally
             child.y = parent_y + padding_y
             child.x = current_x
             current_x += child.width + padding_x
-        elseif layout.layout_rule == AlignCenter
+        elseif layout.alignement == AlignCenter
             # Center the child horizontally and vertically
             child.x = parent_x + (parent_width - child.width) / 2
             child.y = parent_y + (parent_height - child.height) / 2
-        end
-
-        # Recursively apply layout to child components
-        if isa(child, GuiComponent)
-            apply_layout(child)
         end
     end
 end

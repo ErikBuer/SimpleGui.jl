@@ -2,6 +2,7 @@ mutable struct ContainerStyle
     background_color::Tuple{Float32,Float32,Float32,Float32}
     border_color::Tuple{Float32,Float32,Float32,Float32}
     border_width_px::Float32
+    # TODO shadow
 end
 
 # Default style for Container
@@ -13,24 +14,27 @@ end
 The `Container` struct represents a GUI component that can contain other components.
 It is the most basic building block of the GUI system.
 """
-mutable struct Container <: GuiComponent
+mutable struct Container <: AbstractAlignedComponent
     x::Float32          # X position in NDC. Calculated value, not user input
     y::Float32          # Y position in NDC. Calculated value, not user input
     width::Float32      # Width in NDC. Calculated value, not user input
     height::Float32     # Width in NDC. Calculated value, not user input
-    children::Vector{GuiComponent}  # Child components
+    children::Vector{AbstractGuiComponent}  # Child components
     state::ComponentState
     style::ContainerStyle
-    layout::Layout
+    layout::AlignedLayout
 end
 
 # Constructor for internal use
-function _Container(x, y, width, height, children=Vector{GuiComponent}())
-    return Container(x, y, width, height, children, ComponentState(), ContainerStyle(), Layout())
+function _Container(x, y, width, height, children=Vector{AbstractGuiComponent}())
+    return Container(x, y, width, height, children, ComponentState(), ContainerStyle(), AlignedLayout())
 end
 
+"""
+Container constructor.
+"""
 function Container()
-    return Container(0.2, 0.2, 0.2, 0.2, GuiComponent[], ComponentState(), ContainerStyle(), Layout())
+    return Container(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ContainerStyle(), AlignedLayout())
 end
 
 function handle_click(container::Container, mouse_state::MouseState)
@@ -91,7 +95,7 @@ function render(container::Container)
 
     # Adjust container dimensions for padding_px
     padding_px = container.layout.padding_px
-    padded_x = container.x + padding_px
+    padded_x = container.x + padding_px                 #TODO seems padding is not treated correctly (should be scaled from pixels to NDC)
     padded_y = container.y + padding_px
     padded_width = container.width - 2 * padding_px
     padded_height = container.height - 2 * padding_px

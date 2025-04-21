@@ -18,7 +18,7 @@ include("hooks.jl")
 export use_state
 
 include("gui_component.jl")
-export GuiComponent, register_component
+export AbstractGuiComponent, register_component
 export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up
 
 include("events.jl")
@@ -38,12 +38,12 @@ global mouse_state
 mouse_state = MouseState(Dict(GLFW.MOUSE_BUTTON_LEFT => IsReleased, GLFW.MOUSE_BUTTON_RIGHT => IsReleased), 0.0, 0.0)
 
 """
-    global components::Vector{GuiComponent}
+    global components::Vector{AbstractGuiComponent}
 
 A global vector to hold all registered GUI components.
 This is used to keep track of all components (on the top level) that need to be rendered and updated.
 """
-global components = GuiComponent[]
+global components = AbstractGuiComponent[]
 
 
 """

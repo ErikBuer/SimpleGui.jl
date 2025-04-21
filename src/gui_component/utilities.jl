@@ -32,11 +32,11 @@ end
 
 
 """
-    inside_rectangular_component(component::GuiComponent, mouse_state::MouseState)::Bool
+    inside_rectangular_component(component::AbstractGuiComponent, mouse_state::MouseState)::Bool
 
 Check if the mouse is inside a rectangular component.
 """
-function inside_rectangular_component(component::GuiComponent, mouse_state::MouseState)::Bool
+function inside_rectangular_component(component::AbstractGuiComponent, mouse_state::MouseState)::Bool
     # Check if the mouse is inside the component's rectangular area
     x, y = mouse_state.x, mouse_state.y
 
