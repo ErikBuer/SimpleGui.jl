@@ -1,9 +1,9 @@
 abstract type GuiComponent end
 
-include("components/component_state.jl")
-include("components/utilities.jl")
+include("component/component_state.jl")
+include("component/utilities.jl")
 
-include("components/layout.jl")
+include("component/layout.jl")
 export Layout
 export LayoutRule, StackVertical, StackHorizontal, AlignCenter
 export SizeRule, FillParentVertical, FillParentHorizontal, FillParentArea
