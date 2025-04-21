@@ -93,12 +93,16 @@ function render(container::Container)
     border_width_x = (border_width_px / window_width_px) * 2
     border_width_y = (border_width_px / window_height_px) * 2
 
-    # Adjust container dimensions for padding_px
+    # Convert padding from pixels to NDC
     padding_px = container.layout.padding_px
-    padded_x = container.x + padding_px                 #TODO seems padding is not treated correctly (should be scaled from pixels to NDC)
-    padded_y = container.y + padding_px
-    padded_width = container.width - 2 * padding_px
-    padded_height = container.height - 2 * padding_px
+    padding_x = (padding_px / window_width_px) * 2  # Horizontal padding in NDC
+    padding_y = (padding_px / window_height_px) * 2 # Vertical padding in NDC
+
+    # Adjust container dimensions for padding
+    padded_x = container.x + padding_x
+    padded_y = container.y + padding_y
+    padded_width = container.width - 2 * padding_x
+    padded_height = container.height - 2 * padding_y
 
     # Draw the border if border_width > 0
     if border_width_px > 0.0
