@@ -9,8 +9,13 @@ function main()
     # Initialize shaders
     SimpleGui.initialize_shaders()
 
+
+    main_container = SimpleGui._Container(-1.0, -1.0, 2.0, 2.0)
+    main_container.layout.size_rule = FillParentArea
+
     # Create a container
-    container = Container(-0.5, -0.5, 1.0, 1.0)
+    container = SimpleGui._Container(-0.5, -0.5, 1.0, 1.0)
+    container.style.background_color = (0.3, 0.3, 0.6, 0.0)
 
     # Register event listeners
     register_event(container, :on_click, () -> println("Container clicked!"))
@@ -18,16 +23,19 @@ function main()
 
 
     # Create child components
-    child1 = Container(0.0, 0.0, 0.4, 0.4)
-    child2 = Container(0.0, 0.0, 0.2, 0.2)
+    child1 = SimpleGui._Container(0.0, 0.0, 0.4, 0.4)
+    child1.style.background_color = (0.6, 0.3, 0.3, 0.0)
+    child2 = SimpleGui._Container(0.0, 0.0, 0.2, 0.2)
+    child2.style.background_color = (0.3, 0.6, 0.3, 0.0)
 
     # Add children to the parent
     push!(container.children, child1)
     push!(container.children, child2)
 
+    push!(main_container.children, container)
 
     # Register the container
-    register_component(container)
+    register_component(main_container)
 
     # Run the GUI
     SimpleGui.run(window)

@@ -2,28 +2,35 @@ mutable struct ContainerStyle
     background_color::Tuple{Float32,Float32,Float32,Float32}
     border_color::Tuple{Float32,Float32,Float32,Float32}
     border_width_px::Float32
-    padding_px::Float32
 end
 
 # Default style for Container
-function ContainerStyle(; background_color=(0.8, 0.8, 0.8, 1.0), border_color=(0.5, 0.5, 0.5, 1.0), border_width_px=2, padding_px=0.0)
-    return ContainerStyle(background_color, border_color, border_width_px, padding_px)
+function ContainerStyle(; background_color=(0.8, 0.8, 0.8, 1.0), border_color=(0.5, 0.5, 0.5, 1.0), border_width_px=1)
+    return ContainerStyle(background_color, border_color, border_width_px)
 end
 
+"""
+The `Container` struct represents a GUI component that can contain other components.
+It is the most basic building block of the GUI system.
+"""
 mutable struct Container <: GuiComponent
-    x::Float32
-    y::Float32
-    width::Float32
-    height::Float32
+    x::Float32          # X position in NDC. Calculated value, not user input
+    y::Float32          # Y position in NDC. Calculated value, not user input
+    width::Float32      # Width in NDC. Calculated value, not user input
+    height::Float32     # Width in NDC. Calculated value, not user input
     children::Vector{GuiComponent}  # Child components
     state::ComponentState
     style::ContainerStyle
     layout::Layout
 end
 
-# Constructor with default empty event handlers
-function Container(x, y, width, height, children=Vector{GuiComponent}())
+# Constructor for internal use
+function _Container(x, y, width, height, children=Vector{GuiComponent}())
     return Container(x, y, width, height, children, ComponentState(), ContainerStyle(), Layout())
+end
+
+function Container()
+    return Container(0.2, 0.2, 0.2, 0.2, GuiComponent[], ComponentState(), ContainerStyle(), Layout())
 end
 
 function handle_click(container::Container, mouse_state::MouseState)
@@ -77,13 +84,13 @@ function render(container::Container)
     bg_color = container.style.background_color
     border_color = container.style.border_color
     border_width_px = container.style.border_width_px
-    padding_px = container.style.padding_px
 
     # Convert border width from pixels to NDC
     border_width_x = (border_width_px / window_width_px) * 2
     border_width_y = (border_width_px / window_height_px) * 2
 
-    # Adjust container dimensions for padding
+    # Adjust container dimensions for padding_px
+    padding_px = container.layout.padding_px
     padded_x = container.x + padding_px
     padded_y = container.y + padding_px
     padded_width = container.width - 2 * padding_px

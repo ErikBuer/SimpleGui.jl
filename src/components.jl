@@ -6,7 +6,7 @@ include("components/utilities.jl")
 include("components/layout.jl")
 export Layout
 export LayoutRule, StackVertical, StackHorizontal, AlignCenter
-export SizeRule, FixedSize, FillParentVertical, FillParentHorizontal, FillParentArea
+export SizeRule, FillParentVertical, FillParentHorizontal, FillParentArea
 
 
 """    register_component(component::GuiComponent)
