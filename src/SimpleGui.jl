@@ -17,9 +17,12 @@ export mouse_state, mouse_button_callback, ButtonState, IsPressed, IsReleased, M
 include("window_info.jl")
 export initialize_window
 
-include("components.jl")
-export register_component
+include("gui_component.jl")
+export GuiComponent, register_component
 export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up
+
+include("components.jl")
+
 
 include("events.jl")
 export MouseEvent, handle_events, register_event
