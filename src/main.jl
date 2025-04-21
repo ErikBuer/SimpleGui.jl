@@ -18,8 +18,8 @@ function main()
     container.style.background_color = (0.3, 0.3, 0.6, 0.0)
 
     # Register event listeners
-    register_event(container, :on_click, () -> println("Container clicked!"))
-    register_event(container, :on_mouse_enter, (mouse_state) -> println("Mouse entered at ($(mouse_state.x), $(mouse_state.y))"))
+    register_event(container, OnClick, () -> println("Container clicked!"))
+    register_event(container, OnMouseEnter, (mouse_state) -> println("Mouse entered at ($(mouse_state.x), $(mouse_state.y))"))
 
 
     # Create child components

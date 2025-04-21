@@ -1,25 +1,23 @@
-
 """
 Mouse event handling for GUI components.
 This module provides functionality to register and handle mouse events for GUI components.
 
-
-Register funcitons to these events. 
+Register functions to these events using.
 """
-const MouseEvent = Symbol[
-    :on_click,
-    :on_context_menu,
-    :on_dbl_click,
-    :on_mouse_down,
-    :on_mouse_enter,
-    :on_mouse_leave,
-    :on_mouse_move,
-    :on_mouse_out,
-    :on_mouse_over,
-    :on_mouse_up
-]
+@enum MouseEvent begin
+    OnClick
+    OnContextMenu
+    OnDblClick
+    OnMouseDown
+    OnMouseEnter
+    OnMouseLeave
+    OnMouseMove
+    OnMouseOut
+    OnMouseOver
+    OnMouseUp
+end
 
-function register_event(component::GuiComponent, event::Symbol, listener::Function)
+function register_event(component::GuiComponent, event::MouseEvent, listener::Function)
     # Add the listener to the component's event handlers
     component.state.event_handlers[event] = listener
 
@@ -27,7 +25,7 @@ function register_event(component::GuiComponent, event::Symbol, listener::Functi
     component.state.enabled_events[event] = true
 end
 
-function dispatch_event(component::GuiComponent, event::Symbol, args...)
+function dispatch_event(component::GuiComponent, event::MouseEvent, args...)
     state = get_state(component)
     if haskey(state.event_handlers, event)
         handler = state.event_handlers[event]
@@ -48,29 +46,29 @@ function handle_events(mouse_state::MouseState)
 end
 
 function handle_component_events(component::GuiComponent, mouse_state::MouseState)
-    # Iterate through all mouse events
-    for event in MouseEvent
+    # Iterate through all mouse events using `instances(MouseEvent)`
+    for event in instances(MouseEvent)
         if get(component.state.enabled_events, event, false)
             # Call the appropriate handler for the event
-            if event == :on_click
+            if event == OnClick
                 handle_click(component, mouse_state)
-            elseif event == :on_context_menu
+            elseif event == OnContextMenu
                 handle_context_menu(component, mouse_state)
-            elseif event == :on_dbl_click
+            elseif event == OnDblClick
                 handle_dbl_click(component, mouse_state)
-            elseif event == :on_mouse_enter
+            elseif event == OnMouseEnter
                 handle_mouse_enter(component, mouse_state)
-            elseif event == :on_mouse_leave
+            elseif event == OnMouseLeave
                 handle_mouse_leave(component, mouse_state)
-            elseif event == :on_mouse_move
+            elseif event == OnMouseMove
                 handle_mouse_move(component, mouse_state)
-            elseif event == :on_mouse_out
+            elseif event == OnMouseOut
                 handle_mouse_out(component, mouse_state)
-            elseif event == :on_mouse_over
+            elseif event == OnMouseOver
                 handle_mouse_over(component, mouse_state)
-            elseif event == :on_mouse_down
+            elseif event == OnMouseDown
                 handle_mouse_down(component, mouse_state)
-            elseif event == :on_mouse_up
+            elseif event == OnMouseUp
                 handle_mouse_up(component, mouse_state)
             end
         end

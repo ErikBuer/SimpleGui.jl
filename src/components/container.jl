@@ -40,7 +40,7 @@ function handle_click(container::Container, mouse_state::MouseState)
         if mouse_state.button_state[GLFW.MOUSE_BUTTON_LEFT] == IsPressed
             if !state.is_clicked
                 state.is_clicked = true
-                dispatch_event(container, :on_click)
+                dispatch_event(container, OnClick)
             end
         elseif state.is_clicked
             state.is_clicked = false
@@ -53,7 +53,7 @@ function handle_mouse_enter(container::Container, mouse_state::MouseState)
     if inside_rectangular_component(container, mouse_state)
         if !state.is_hovered
             state.is_hovered = true
-            dispatch_event(container, :on_mouse_enter, mouse_state)
+            dispatch_event(container, OnMouseEnter, mouse_state)
         end
     else
         if state.is_hovered
@@ -67,7 +67,7 @@ function handle_mouse_leave(container::Container, mouse_state::MouseState)
     if !(inside_rectangular_component(container, mouse_state))
         if state.is_hovered
             state.is_hovered = false
-            dispatch_event(container, :on_mouse_leave, mouse_state)
+            dispatch_event(container, OnMouseLeave, mouse_state)
         end
     end
 end

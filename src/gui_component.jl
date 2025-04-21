@@ -1,8 +1,5 @@
 abstract type GuiComponent end
 
-include("gui_component/component_state.jl")
-export ComponentState, get_state
-
 include("gui_component/utilities.jl")
 
 include("gui_component/layout.jl")

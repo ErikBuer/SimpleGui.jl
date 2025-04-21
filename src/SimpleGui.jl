@@ -5,9 +5,6 @@ const GLA = GLAbstraction
 
 using GeometryBasics
 
-include("hooks.jl")
-export use_state
-
 include("shader.jl")
 export initialize_shaders, prog
 
@@ -17,15 +14,22 @@ export mouse_state, mouse_button_callback, ButtonState, IsPressed, IsReleased, M
 include("window_info.jl")
 export initialize_window
 
+include("hooks.jl")
+export use_state
+
 include("gui_component.jl")
 export GuiComponent, register_component
 export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up
 
+include("events.jl")
+export register_event
+export OnClick, OnContextMenu, OnDblClick, OnMouseDown, OnMouseEnter, OnMouseLeave, OnMouseMove, OnMouseOut, OnMouseOver, OnMouseUp
+
+include("gui_component/component_state.jl")
+export ComponentState, get_state
+
 include("components.jl")
 
-
-include("events.jl")
-export MouseEvent, handle_events, register_event
 
 # Create a global instance of the window info
 global window_info = WindowInfo(800, 600, nothing)
