@@ -28,6 +28,42 @@ function px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
     return (px / dim_px) * 2
 end
 
+
+function draw_closed_lines(vertices::Vector{Point2f0}, color::Tuple{Float32,Float32,Float32}, shader_program::GLuint)
+    # Bind the shader program
+    glUseProgram(shader_program)
+
+    # Generate a Vertex Array Object (VAO)
+    vao = Ref(GLuint(0))
+    glGenVertexArrays(1, vao)
+    glBindVertexArray(vao[])
+
+    # Generate a Vertex Buffer Object (VBO) and upload vertex data
+    vbo = Ref(GLuint(0))
+    glGenBuffers(1, vbo)
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[])
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW)
+
+    # Link vertex data to the shader's position attribute
+    pos_attribute = glGetAttribLocation(shader_program, "position")
+    glVertexAttribPointer(pos_attribute, 2, GL_FLOAT, GL_FALSE, 0, C_NULL)
+    glEnableVertexAttribArray(pos_attribute)
+
+    # Set the uniform color
+    color_uniform = glGetUniformLocation(shader_program, "triangleColor")
+    glUniform3f(color_uniform, color[1], color[2], color[3])
+
+    # Draw the vertices as a line loop
+    glDrawArrays(GL_LINE_LOOP, 0, length(vertices))
+
+    # Cleanup
+    glDisableVertexAttribArray(pos_attribute)
+    glBindBuffer(GL_ARRAY_BUFFER, 0)
+    glBindVertexArray(0)
+    glDeleteBuffers(1, vbo)
+    glDeleteVertexArrays(1, vao)
+end
+
 window_width_px = 800
 window_height_px = 600
 
@@ -125,10 +161,10 @@ while !GLFW.WindowShouldClose(window)
     glClear(GL_COLOR_BUFFER_BIT)
 
     # Set the border color (e.g., white)
-    glUniform3f(uni_color, 1.0f0, 1.0f0, 1.0f0)
+    border_color = (1.0f0, 1.0f0, 1.0f0)
 
-    # Draw the triangle borders as a line loop
-    glDrawArrays(GL_LINE_LOOP, 0, length(vertices))
+    # Draw the rectangle border using the reusable function
+    draw_closed_lines(vertices, border_color, shader_program)
 
     GLFW.SwapBuffers(window)
     GLFW.PollEvents()
