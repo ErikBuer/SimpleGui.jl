@@ -1,35 +1,15 @@
-using ModernGL, GeometryTypes, GLAbstraction, GLFW
+using ModernGL, GeometryBasics, GLAbstraction, GLFW
 
-"""
-    dc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
-
-Convert NDC scale to pixels.
-
-```jldoctest
-julia> ndc_to_px(0.5, 800)
-200.0
-```
-"""
 function ndc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
     return (dim / 2) * dim_px
 end
 
-"""
-    px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
-
-Convert pixel to NDC scale.
-
-```jldoctest
-julia> px_to_ndc(200.0, 800)
-0.5
-```
-"""
 function px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
     return (px / dim_px) * 2
 end
 
 
-function draw_closed_lines(vertices::Vector{Point2f0}, color::Tuple{Float32,Float32,Float32}, shader_program::GLuint)
+function draw_closed_lines(vertices::Vector{Point2f}, color::Tuple{Float32,Float32,Float32}, shader_program::GLuint)
     # Bind the shader program
     glUseProgram(shader_program)
 
@@ -74,7 +54,7 @@ glGenVertexArrays(1, vao)
 glBindVertexArray(vao[])
 
 # The vertices of our rectangle
-vertices = Point2f0[(-0.5, 0.5), (0.5, 0.5), (0.5, -0.5), (-0.5, -0.5)]
+vertices = Point2f[(-0.5, 0.5), (0.5, 0.5), (0.5, -0.5), (-0.5, -0.5)]
 
 
 vbo = Ref(GLuint(0))   # initial value is irrelevant, just allocate space
