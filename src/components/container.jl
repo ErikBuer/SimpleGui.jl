@@ -1,11 +1,14 @@
 mutable struct ContainerStyle
-    background_color::Tuple{Float32,Float32,Float32,Float32}
-    border_color::Tuple{Float32,Float32,Float32,Float32}
+    background_color::Vec4{<:AbstractFloat} #RGBA color
+    border_color::Vec4{<:AbstractFloat} #RGBA color
     border_width_px::Float32
+    # TODO shadow
 end
 
-# Default style for Container
-function ContainerStyle(; background_color=(0.8, 0.8, 0.8, 1.0), border_color=(0.5, 0.5, 0.5, 1.0), border_width_px=1)
+function ContainerStyle(;
+    background_color=Vec{4,Float32}(0.8f0, 0.8f0, 0.8f0, 1.0f0),
+    border_color=Vec{4,Float32}(0.0f0, 0.0f0, 0.0f0, 1.0f0),
+    border_width_px=1.0f0)
     return ContainerStyle(background_color, border_color, border_width_px)
 end
 
@@ -13,24 +16,27 @@ end
 The `Container` struct represents a GUI component that can contain other components.
 It is the most basic building block of the GUI system.
 """
-mutable struct Container <: GuiComponent
+mutable struct Container <: AbstractAlignedComponent
     x::Float32          # X position in NDC. Calculated value, not user input
     y::Float32          # Y position in NDC. Calculated value, not user input
     width::Float32      # Width in NDC. Calculated value, not user input
     height::Float32     # Width in NDC. Calculated value, not user input
-    children::Vector{GuiComponent}  # Child components
+    children::Vector{AbstractGuiComponent}  # Child components
     state::ComponentState
     style::ContainerStyle
-    layout::Layout
+    layout::AlignedLayout
 end
 
 # Constructor for internal use
-function _Container(x, y, width, height, children=Vector{GuiComponent}())
-    return Container(x, y, width, height, children, ComponentState(), ContainerStyle(), Layout())
+function _Container(x, y, width, height, children=Vector{AbstractGuiComponent}())
+    return Container(x, y, width, height, children, ComponentState(), ContainerStyle(), AlignedLayout())
 end
 
+"""
+Container constructor.
+"""
 function Container()
-    return Container(0.2, 0.2, 0.2, 0.2, GuiComponent[], ComponentState(), ContainerStyle(), Layout())
+    return Container(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ContainerStyle(), AlignedLayout())
 end
 
 function handle_click(container::Container, mouse_state::MouseState)
@@ -86,52 +92,31 @@ function render(container::Container)
     border_width_px = container.style.border_width_px
 
     # Convert border width from pixels to NDC
-    border_width_x = (border_width_px / window_width_px) * 2
-    border_width_y = (border_width_px / window_height_px) * 2
+    border_width_x = px_to_ndc(border_width_px, window_width_px)
+    border_width_y = px_to_ndc(border_width_px, window_height_px)
 
-    # Adjust container dimensions for padding_px
+    # Convert padding from pixels to NDC
     padding_px = container.layout.padding_px
-    padded_x = container.x + padding_px
-    padded_y = container.y + padding_px
-    padded_width = container.width - 2 * padding_px
-    padded_height = container.height - 2 * padding_px
+    padding_x = px_to_ndc(padding_px, window_width_px)
+    padding_y = px_to_ndc(padding_px, window_height_px)
 
-    # Draw the border if border_width > 0
-    if border_width_px > 0.0
-        # Generate vertices for the border rectangle
-        border_positions, border_colors, border_elements = generate_rectangle(
-            padded_x - border_width_x, padded_y - border_width_y,
-            padded_width + 2 * border_width_x, padded_height + 2 * border_width_y,
-            border_color
-        )
-
-        # Generate buffers and vertex array for the border
-        border_buffers = GLA.generate_buffers(prog[], position=border_positions, color=border_colors)
-        border_vao = GLA.VertexArray(border_buffers, border_elements)
-
-        # Bind and draw the border
-        GLA.bind(prog[])
-        GLA.bind(border_vao)
-        GLA.draw(border_vao)
-        GLA.unbind(border_vao)
-        GLA.unbind(prog[])
-    end
+    # Adjust container dimensions for padding
+    padded_x = container.x + padding_x
+    padded_y = container.y + padding_y
+    padded_width = container.width - 2 * padding_x
+    padded_height = container.height - 2 * padding_y
 
     # Generate vertices for the main rectangle
-    vertex_positions, vertex_colors, elements = generate_rectangle(
-        padded_x, padded_y, padded_width, padded_height, bg_color
+    vertex_positions = generate_rectangle_vertices(
+        padded_x, padded_y, padded_width, padded_height
     )
 
-    # Generate buffers and vertex array for the main rectangle
-    buffers = GLA.generate_buffers(prog[], position=vertex_positions, color=vertex_colors)
-    vao = GLA.VertexArray(buffers, elements)
+    # Draw the main rectangle (background)
+    draw_rectangle(vertex_positions, bg_color)
 
-    # Bind and draw the main rectangle
-    GLA.bind(prog[])
-    GLA.bind(vao)
-    GLA.draw(vao)
-    GLA.unbind(vao)
-    GLA.unbind(prog[])
+    if 0.0 < border_width_px
+        draw_closed_lines(vertex_positions, border_color)
+    end
 
     # Render child components
     for child in container.children

@@ -17,7 +17,7 @@ Register functions to these events using.
     OnMouseUp
 end
 
-function register_event(component::GuiComponent, event::MouseEvent, listener::Function)
+function register_event(component::AbstractGuiComponent, event::MouseEvent, listener::Function)
     # Add the listener to the component's event handlers
     component.state.event_handlers[event] = listener
 
@@ -25,7 +25,7 @@ function register_event(component::GuiComponent, event::MouseEvent, listener::Fu
     component.state.enabled_events[event] = true
 end
 
-function dispatch_event(component::GuiComponent, event::MouseEvent, args...)
+function dispatch_event(component::AbstractGuiComponent, event::MouseEvent, args...)
     state = get_state(component)
     if haskey(state.event_handlers, event)
         handler = state.event_handlers[event]
@@ -41,11 +41,26 @@ end
 
 function handle_events(mouse_state::MouseState)
     for component in components
+        if isa(component, ScrollArea)
+            # Handle vertical scroll bar events
+            if component.vertical_scrollbar.visible
+                handle_scroll_interaction(component.vertical_scrollbar, mouse_state)
+                handle_scroll_event(component.vertical_scrollbar, component, mouse_state)
+            end
+
+            # Handle horizontal scroll bar events
+            if component.horizontal_scrollbar.visible
+                handle_scroll_interaction(component.horizontal_scrollbar, mouse_state)
+                handle_scroll_event(component.horizontal_scrollbar, component, mouse_state)
+            end
+        end
+
+        # Handle events for the child component
         handle_component_events(component, mouse_state)
     end
 end
 
-function handle_component_events(component::GuiComponent, mouse_state::MouseState)
+function handle_component_events(component::AbstractGuiComponent, mouse_state::MouseState)
     # Iterate through all mouse events using `instances(MouseEvent)`
     for event in instances(MouseEvent)
         if get(component.state.enabled_events, event, false)

@@ -12,6 +12,6 @@ function ComponentState()
     return ComponentState(false, false, Dict{MouseEvent,Function}(), Dict{MouseEvent,Bool}())
 end
 
-function get_state(component::GuiComponent)::ComponentState
+function get_state(component::AbstractGuiComponent)::ComponentState
     return component.state
 end

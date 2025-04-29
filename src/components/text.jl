@@ -12,7 +12,7 @@ function TextStyle(; font_size_px=12.0, font_color=(0.0, 0.0, 0.0, 1.0), font_fa
     return TextStyle(font_size_px, font_color, font_family, font_weight, font_style, text_align, Layout())
 end
 
-mutable struct Text <: GuiComponent
+mutable struct Text <: AbstractGuiComponent
     text::String
     x::Float32
     y::Float32

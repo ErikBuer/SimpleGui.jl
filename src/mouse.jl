@@ -1,4 +1,13 @@
 """
+Enum representing the different mouse buttons.
+
+- `LeftButton`: The left mouse button.
+- `RightButton`: The right mouse button.
+- `MiddleButton`: The middle mouse button (scroll button).
+"""
+@enum MouseButton LeftButton RightButton MiddleButton   # TODO replace GLFW.MouseButton with this enum
+
+"""
 Enum representing the state of a mouse button.
 
 - `IsReleased`: The button is currently released.
