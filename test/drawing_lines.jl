@@ -43,9 +43,9 @@ function px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
 end
 
 
-function draw_closed_lines(vertices::Vector{Point2f}, rgba::Tuple{Float32,Float32,Float32,Float32})
+function draw_closed_lines(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFloat})
     # Generate a uniform color array for all vertices
-    colors = Vec{4,Float32}[Vec(rgba[1], rgba[2], rgba[3], rgba[4]) for _ in 1:length(vertices)]
+    colors = Vec{4,Float32}[color_rgba for _ in 1:length(vertices)]
 
     # Generate buffers for positions and colors
     buffers = GLA.generate_buffers(prog[], position=vertices, color=colors)
@@ -79,7 +79,8 @@ initialize_shaders()
 vertices = Point2f[(-0.5, 0.5), (0.5, 0.5), (0.5, -0.5), (-0.5, -0.5)]
 
 # Uniform color (e.g., red)
-rgba = (1.0f0, 0.0f0, 0.0f0, 1.0f0)  # Red
+rgba::Vec4{Float32} = [1.0f0, 1.0f0, 1.0f0, 1.0f0]
+
 
 # Main rendering loop
 glClearColor(0, 0, 0, 0)
