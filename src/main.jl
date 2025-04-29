@@ -11,6 +11,7 @@ function main()
 
     # TODO Currently a primary component is needed, covering the whole window
     main_container = SimpleGui._Container(-1.0, -1.0, 2.0, 2.0)
+    main_container.layout.padding_px = 0.0
 
     top_bar = DockedContainer()
     top_bar.layout.docking = DockTop

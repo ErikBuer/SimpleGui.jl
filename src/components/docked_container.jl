@@ -33,27 +33,6 @@ function render(container::DockedContainer)
     border_width_x = px_to_ndc(border_width_px, window_width_px)
     border_width_y = px_to_ndc(border_width_px, window_height_px)
 
-    # Draw the border if border_width > 0
-    if border_width_px > 0.0
-        # Generate vertices for the border rectangle
-        border_positions, border_colors, border_elements = generate_rectangle(
-            container.x - border_width_x, container.y - border_width_y,
-            container.width + 2 * border_width_x, container.height + 2 * border_width_y,
-            border_color
-        )
-
-        # Generate buffers and vertex array for the border
-        border_buffers = GLA.generate_buffers(prog[], position=border_positions, color=border_colors)
-        border_vao = GLA.VertexArray(border_buffers, border_elements)
-
-        # Bind and draw the border
-        GLA.bind(prog[])
-        GLA.bind(border_vao)
-        GLA.draw(border_vao)
-        GLA.unbind(border_vao)
-        GLA.unbind(prog[])
-    end
-
     # Generate vertices for the main rectangle
     vertex_positions, vertex_colors, elements = generate_rectangle(
         container.x, container.y, container.width, container.height, bg_color
@@ -69,6 +48,11 @@ function render(container::DockedContainer)
     GLA.draw(vao)
     GLA.unbind(vao)
     GLA.unbind(prog[])
+
+    if 0.0 < border_width_px
+        draw_closed_lines(vertex_positions, border_color)
+    end
+
 
     # Render child components
     for child in container.children

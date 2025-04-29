@@ -30,6 +30,27 @@ function generate_rectangle(x, y, width, height, color)
     return vertices, colors, elements
 end
 
+function draw_closed_lines(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFloat})
+    # Generate a uniform color array for all vertices
+    colors = Vec{4,Float32}[color_rgba for _ in 1:length(vertices)]
+
+    # Generate buffers for positions and colors
+    buffers = GLA.generate_buffers(prog[], position=vertices, color=colors)
+
+    # Create a Vertex Array Object (VAO) with the primitive type GL_LINE_LOOP
+    vao = GLA.VertexArray(buffers, GL_LINE_LOOP)
+
+    # Bind the shader program and VAO
+    GLA.bind(prog[])
+    GLA.bind(vao)
+
+    # Draw the vertices using the VAO
+    GLA.draw(vao)
+
+    # Unbind the VAO and shader program
+    GLA.unbind(vao)
+    GLA.unbind(prog[])
+end
 
 """
     inside_rectangular_component(component::AbstractGuiComponent, mouse_state::MouseState)::Bool

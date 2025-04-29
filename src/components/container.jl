@@ -1,12 +1,13 @@
 mutable struct ContainerStyle
     background_color::Tuple{Float32,Float32,Float32,Float32}
-    border_color::Tuple{Float32,Float32,Float32,Float32}
+    border_color::Vec4{<:AbstractFloat}
     border_width_px::Float32
     # TODO shadow
 end
 
-# Default style for Container
-function ContainerStyle(; background_color=(0.8, 0.8, 0.8, 1.0), border_color=(0.5, 0.5, 0.5, 1.0), border_width_px=1)
+function ContainerStyle(; background_color=(0.8f0, 0.8f0, 0.8f0, 1.0f0),
+    border_color=Vec{4,Float32}(1.0f0, 1.0f0, 1.0f0, 1.0f0),
+    border_width_px=1.0f0)
     return ContainerStyle(background_color, border_color, border_width_px)
 end
 
@@ -104,27 +105,6 @@ function render(container::Container)
     padded_width = container.width - 2 * padding_x
     padded_height = container.height - 2 * padding_y
 
-    # Draw the border if border_width > 0
-    if border_width_px > 0.0
-        # Generate vertices for the border rectangle
-        border_positions, border_colors, border_elements = generate_rectangle(
-            padded_x - border_width_x, padded_y - border_width_y,
-            padded_width + 2 * border_width_x, padded_height + 2 * border_width_y,
-            border_color
-        )
-
-        # Generate buffers and vertex array for the border
-        border_buffers = GLA.generate_buffers(prog[], position=border_positions, color=border_colors)
-        border_vao = GLA.VertexArray(border_buffers, border_elements)
-
-        # Bind and draw the border
-        GLA.bind(prog[])
-        GLA.bind(border_vao)
-        GLA.draw(border_vao)
-        GLA.unbind(border_vao)
-        GLA.unbind(prog[])
-    end
-
     # Generate vertices for the main rectangle
     vertex_positions, vertex_colors, elements = generate_rectangle(
         padded_x, padded_y, padded_width, padded_height, bg_color
@@ -140,6 +120,10 @@ function render(container::Container)
     GLA.draw(vao)
     GLA.unbind(vao)
     GLA.unbind(prog[])
+
+    if 0.0 < border_width_px
+        draw_closed_lines(vertex_positions, border_color)
+    end
 
     # Render child components
     for child in container.children
