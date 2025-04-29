@@ -34,20 +34,12 @@ function render(container::DockedContainer)
     border_width_y = px_to_ndc(border_width_px, window_height_px)
 
     # Generate vertices for the main rectangle
-    vertex_positions, vertex_colors, elements = generate_rectangle(
-        container.x, container.y, container.width, container.height, bg_color
+    vertex_positions = generate_rectangle_vertices(
+        container.x, container.y, container.width, container.height
     )
 
-    # Generate buffers and vertex array for the main rectangle
-    buffers = GLA.generate_buffers(prog[], position=vertex_positions, color=vertex_colors)
-    vao = GLA.VertexArray(buffers, elements)
-
-    # Bind and draw the main rectangle
-    GLA.bind(prog[])
-    GLA.bind(vao)
-    GLA.draw(vao)
-    GLA.unbind(vao)
-    GLA.unbind(prog[])
+    # Draw the main rectangle (background)
+    draw_rectangle(vertex_positions, bg_color)
 
     if 0.0 < border_width_px
         draw_closed_lines(vertex_positions, border_color)

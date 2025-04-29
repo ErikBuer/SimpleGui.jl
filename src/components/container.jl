@@ -1,12 +1,13 @@
 mutable struct ContainerStyle
-    background_color::Tuple{Float32,Float32,Float32,Float32}
-    border_color::Vec4{<:AbstractFloat}
+    background_color::Vec4{<:AbstractFloat} #RGBA color
+    border_color::Vec4{<:AbstractFloat} #RGBA color
     border_width_px::Float32
     # TODO shadow
 end
 
-function ContainerStyle(; background_color=(0.8f0, 0.8f0, 0.8f0, 1.0f0),
-    border_color=Vec{4,Float32}(1.0f0, 1.0f0, 1.0f0, 1.0f0),
+function ContainerStyle(;
+    background_color=Vec{4,Float32}(0.8f0, 0.8f0, 0.8f0, 1.0f0),
+    border_color=Vec{4,Float32}(0.0f0, 0.0f0, 0.0f0, 1.0f0),
     border_width_px=1.0f0)
     return ContainerStyle(background_color, border_color, border_width_px)
 end
@@ -106,20 +107,12 @@ function render(container::Container)
     padded_height = container.height - 2 * padding_y
 
     # Generate vertices for the main rectangle
-    vertex_positions, vertex_colors, elements = generate_rectangle(
-        padded_x, padded_y, padded_width, padded_height, bg_color
+    vertex_positions = generate_rectangle_vertices(
+        padded_x, padded_y, padded_width, padded_height
     )
 
-    # Generate buffers and vertex array for the main rectangle
-    buffers = GLA.generate_buffers(prog[], position=vertex_positions, color=vertex_colors)
-    vao = GLA.VertexArray(buffers, elements)
-
-    # Bind and draw the main rectangle
-    GLA.bind(prog[])
-    GLA.bind(vao)
-    GLA.draw(vao)
-    GLA.unbind(vao)
-    GLA.unbind(prog[])
+    # Draw the main rectangle (background)
+    draw_rectangle(vertex_positions, bg_color)
 
     if 0.0 < border_width_px
         draw_closed_lines(vertex_positions, border_color)

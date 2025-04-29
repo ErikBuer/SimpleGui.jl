@@ -1,6 +1,7 @@
 include("SimpleGui.jl")
 using .SimpleGui
 
+using GeometryBasics
 
 function main()
     # Initialize the window
@@ -25,7 +26,7 @@ function main()
 
     # Create a container
     container = SimpleGui._Container(-0.5, -0.5, 1.0, 1.0)
-    container.style.background_color = (0.3, 0.3, 0.6, 0.0)
+    container.style.background_color = Vec4(0.3, 0.3, 0.6, 1.0)
 
     # Register event listeners
     register_event(container, OnClick, () -> println("Container clicked!"))
@@ -34,9 +35,9 @@ function main()
 
     # Create child components
     child1 = SimpleGui._Container(0.0, 0.0, 0.4, 0.4)
-    child1.style.background_color = (0.6, 0.3, 0.3, 0.0)
+    child1.style.background_color = Vec4(0.6, 0.3, 0.3, 1.0)
     child2 = SimpleGui._Container(0.0, 0.0, 0.2, 0.2)
-    child2.style.background_color = (0.3, 0.6, 0.3, 0.0)
+    child2.style.background_color = Vec4(0.3, 0.6, 0.3, 1.0)
 
     # Add children to the parent
     push!(container.children, child1)
