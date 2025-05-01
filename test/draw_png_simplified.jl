@@ -1,12 +1,27 @@
 using ModernGL, GLFW, GLAbstraction
-import GLAbstraction: N0f8
 const GLA = GLAbstraction
 
 using ColorTypes, GeometryBasics
 using FileIO
 
+mutable struct WindowInfo
+    width_px::Integer
+    height_px::Integer
+    handle::Union{GLFW.Window,Nothing}
+end
+
+global window_info = WindowInfo(800, 600, nothing)
+
+function ndc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
+    return (dim / 2) * dim_px
+end
+
+function px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
+    return (px / dim_px) * 2
+end
+
 # Initialize the OpenGL context and window
-const window = GLFW.Window(name="Example")
+const window = GLFW.Window(name="Example", resolution=(window_info.width_px, window_info.height_px))
 GLFW.MakeContextCurrent(window)
 GLA.set_context!(window)
 
@@ -58,18 +73,30 @@ function load_texture(file_path::String)::GLAbstraction.Texture
     return texture
 end
 
-file_path = "test/images/logo.png"
+function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::AbstractFloat; scale::AbstractFloat=1.0)
+    global window_info
 
-# Load the texture from an image file
-tex = load_texture(file_path)  # Replace with the path to your image file
+    # Get the image size from the texture
+    width_px, height_px = GLA.size(texture)
 
-function draw_image(tex::GLAbstraction.Texture, program::GLAbstraction.Program)
-    # Define rectangle vertices
+    # Convert image size to normalized device coordinates (NDC)
+    width_ndc = px_to_ndc(width_px * scale, window_info.width_px)
+    height_ndc = px_to_ndc(height_px * scale, window_info.height_px)
+
+
     vertices = [
         Point2f(-1, -1),  # Bottom-left
         Point2f(1, -1),   # Bottom-right
         Point2f(-1, 1),   # Top-left
         Point2f(1, 1)     # Top-right
+    ]
+
+    # Define rectangle vertices and texture coordinates
+    vertices = [
+        Point2f(x, y),                          # Bottom-left
+        Point2f(x + width_ndc, y),              # Bottom-right
+        Point2f(x, y + height_ndc),             # Top-left
+        Point2f(x + width_ndc, y + height_ndc)  # Top-right
     ]
 
     # Define texture coordinates
@@ -100,7 +127,7 @@ function draw_image(tex::GLAbstraction.Texture, program::GLAbstraction.Program)
     GLA.bind(program)
 
     # Bind the texture to the shader's sampler2D uniform
-    GLA.gluniform(program, :image, 0, tex)
+    GLA.gluniform(program, :image, 0, texture)
 
     # Bind the VAO and draw the rectangle
     GLA.bind(vao)
@@ -111,6 +138,11 @@ function draw_image(tex::GLAbstraction.Texture, program::GLAbstraction.Program)
     GLA.unbind(program)
 end
 
+file_path = "test/images/logo.png"
+
+# Load the texture from an image file
+tex = load_texture(file_path)  # Replace with the path to your image file
+
 # Set the clear color
 glClearColor(0, 0, 0, 1)
 
@@ -118,7 +150,8 @@ glClearColor(0, 0, 0, 1)
 while !GLFW.WindowShouldClose(window)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    draw_image(tex, program)
+    # Draw the image at position (0.0, 0.0)
+    draw_image(tex, 0.0f0, 0.0f0)
 
     # Swap buffers and poll events
     GLFW.SwapBuffers(window)
