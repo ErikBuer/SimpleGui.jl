@@ -44,10 +44,13 @@ program = GLA.Program(vert, frag)
 function load_texture(file_path::String)::GLAbstraction.Texture
     # Load the image using FileIO
     img = FileIO.load(file_path)  # Returns a Matrix{RGBA{N0f8}}
+    # Transpose the image to match OpenGL's coordinate system and materialize it as a proper array
+    img = permutedims(img)  # Swap dimensions 1 and 2 for a proper transpose
 
     # Debug: Check the image properties
     println("Image size: ", size(img))
     println("Image type: ", typeof(img))
+
 
     # Create a GLAbstraction texture
     texture = GLA.Texture(img; minfilter=:linear, magfilter=:linear, x_repeat=:clamp_to_edge, y_repeat=:clamp_to_edge)
@@ -55,8 +58,10 @@ function load_texture(file_path::String)::GLAbstraction.Texture
     return texture
 end
 
+file_path = "test/images/logo.png"
+
 # Load the texture from an image file
-tex = load_texture("test/images/logo.png")  # Replace with the path to your image file
+tex = load_texture(file_path)  # Replace with the path to your image file
 
 function draw_image(tex::GLAbstraction.Texture, program::GLAbstraction.Program)
     # Define rectangle vertices
