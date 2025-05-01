@@ -2,12 +2,11 @@ mutable struct ContainerStyle
     background_color::Vec4{<:AbstractFloat} #RGBA color
     border_color::Vec4{<:AbstractFloat} #RGBA color
     border_width_px::Float32
-    # TODO shadow
 end
 
 function ContainerStyle(;
-    background_color=Vec{4,Float32}(0.8f0, 0.8f0, 0.8f0, 1.0f0),
-    border_color=Vec{4,Float32}(0.0f0, 0.0f0, 0.0f0, 1.0f0),
+    background_color=Vec4{Float32}(0.8f0, 0.8f0, 0.8f0, 1.0f0),
+    border_color=Vec4{Float32}(0.0f0, 0.0f0, 0.0f0, 1.0f0),
     border_width_px=1.0f0)
     return ContainerStyle(background_color, border_color, border_width_px)
 end

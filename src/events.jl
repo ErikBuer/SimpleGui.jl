@@ -39,28 +39,32 @@ function dispatch_event(component::AbstractGuiComponent, event::MouseEvent, args
     end
 end
 
+
 function handle_events(mouse_state::MouseState)
-    for component in components
-        if isa(component, ScrollArea)
-            # Handle vertical scroll bar events
-            if component.vertical_scrollbar.visible
-                handle_scroll_interaction(component.vertical_scrollbar, mouse_state)
-                handle_scroll_event(component.vertical_scrollbar, component, mouse_state)
-            end
-
-            # Handle horizontal scroll bar events
-            if component.horizontal_scrollbar.visible
-                handle_scroll_interaction(component.horizontal_scrollbar, mouse_state)
-                handle_scroll_event(component.horizontal_scrollbar, component, mouse_state)
-            end
-        end
-
-        # Handle events for the child component
+    for component in main_container.children
+        # Handle events for the component
         handle_component_events(component, mouse_state)
     end
 end
 
 function handle_component_events(component::AbstractGuiComponent, mouse_state::MouseState)
+
+    # TODO
+    if isa(component, ScrollArea)
+        # Handle vertical scroll bar events
+        if component.vertical_scrollbar.visible
+            handle_scroll_interaction(component.vertical_scrollbar, mouse_state)
+            handle_scroll_event(component.vertical_scrollbar, component, mouse_state)
+        end
+
+        # Handle horizontal scroll bar events
+        if component.horizontal_scrollbar.visible
+            handle_scroll_interaction(component.horizontal_scrollbar, mouse_state)
+            handle_scroll_event(component.horizontal_scrollbar, component, mouse_state)
+        end
+    end
+
+
     # Iterate through all mouse events using `instances(MouseEvent)`
     for event in instances(MouseEvent)
         if get(component.state.enabled_events, event, false)

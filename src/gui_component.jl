@@ -15,17 +15,7 @@ export AlignedLayout, DockedLayout
 export Alignement, StackVertical, StackHorizontal, AlignCenter
 export SizeRule, FillParentVertical, FillParentHorizontal, FillParentArea
 export Docking, DockTop, DockBottom, DockLeft, DockRight
-
-
-"""
-    register_component(component::AbstractGuiComponent)
-
-Register a GUI component to the global list of components.
-This function is used to keep track of all components (on the top level) that need to be rendered and updated.
-"""
-function register_component(component::AbstractGuiComponent)
-    push!(components, component)
-end
+export set_color
 
 # Placeholder functions for components
 function handle_click(component::AbstractGuiComponent, mouse_state::MouseState)
@@ -72,4 +62,27 @@ This function assumes that `apply_layout` has already been called to calculate t
 """
 function render(component::AbstractGuiComponent)
     error("render is not implemented for $(typeof(component))")
+end
+
+
+function set_color(component::AbstractGuiComponent, color::AbstractVector{<:Real})
+    if 4 < length(color)
+        error("Color vector must have 4 elements (RGBA).")
+    elseif length(color) == 3
+        # If only RGB is provided, set alpha to 1.0
+        color = [color; 1.0]
+    end
+    component.style.background_color = color
+end
+
+function set_color(component::AbstractGuiComponent, color::ColorTypes.RGBA)
+    # Convert RGBA to Vec4
+    color_vec = Vec4(color.r, color.g, color.b, color.a)
+    component.style.background_color = color_vec
+end
+
+function set_color(component::AbstractGuiComponent, color::ColorTypes.RGB{<:AbstractFloat})
+    # Convert RGB to Vec4
+    color_vec = Vec4(color.r, color.g, color.b, 1.0)
+    component.style.background_color = color_vec
 end
