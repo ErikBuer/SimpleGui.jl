@@ -51,3 +51,52 @@ function render(container::DockedContainer)
         render(child)
     end
 end
+
+function handle_click(container::DockedContainer, mouse_state::MouseState)
+    state = get_state(container)
+
+    if inside_rectangular_component(container, mouse_state)
+        if mouse_state.button_state[GLFW.MOUSE_BUTTON_LEFT] == IsPressed
+            if !state.is_clicked
+                state.is_clicked = true
+                dispatch_event(container, OnClick)
+            end
+        elseif state.is_clicked
+            state.is_clicked = false
+        end
+    end
+end
+
+function handle_mouse_enter(container::DockedContainer, mouse_state::MouseState)
+    state = get_state(container)
+    if inside_rectangular_component(container, mouse_state)
+        if !state.is_hovered
+            state.is_hovered = true
+            dispatch_event(container, OnMouseEnter, mouse_state)
+        end
+    else
+        if state.is_hovered
+            state.is_hovered = false
+        end
+    end
+end
+
+function handle_mouse_leave(container::DockedContainer, mouse_state::MouseState)
+    state = get_state(container)
+    if !(inside_rectangular_component(container, mouse_state))
+        if state.is_hovered
+            state.is_hovered = false
+            dispatch_event(container, OnMouseLeave, mouse_state)
+        end
+    end
+end
+
+function handle_mouse_over(container::DockedContainer, mouse_state::MouseState)
+    state = get_state(container)
+
+    # Check if the mouse is inside the container's bounds
+    if inside_rectangular_component(container, mouse_state)
+        # Dispatch the OnMouseOver event
+        dispatch_event(container, OnMouseOver, mouse_state)
+    end
+end

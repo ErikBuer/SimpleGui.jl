@@ -78,6 +78,16 @@ function handle_mouse_leave(container::Container, mouse_state::MouseState)
     end
 end
 
+function handle_mouse_over(container::Container, mouse_state::MouseState)
+    state = get_state(container)
+
+    # Check if the mouse is inside the container's bounds
+    if inside_rectangular_component(container, mouse_state)
+        # Dispatch the OnMouseOver event
+        dispatch_event(container, OnMouseOver, mouse_state)
+    end
+end
+
 function render(container::Container)
     # Apply layout to position child components
     apply_layout(container)
