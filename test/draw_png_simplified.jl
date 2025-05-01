@@ -1,8 +1,8 @@
 using ModernGL, GLFW, GLAbstraction
 const GLA = GLAbstraction
 
-using ColorTypes, GeometryBasics
-using FileIO
+using GeometryBasics
+using FileIO, IndirectArrays, ColorTypes, OffsetArrays
 
 mutable struct WindowInfo
     width_px::Integer
@@ -68,10 +68,16 @@ program = GLA.Program(vertex_shader, fragment_shader)
 # Function to load a texture from an image file
 function load_texture(file_path::String)::GLAbstraction.Texture
     # Load the image using FileIO
-    img = FileIO.load(file_path)  # Returns a Matrix{RGBA{N0f8}}
-    # Transpose the image to match OpenGL's coordinate system and materialize it as a proper array
-    img = permutedims(img)  # Swap dimensions 1 and 2 for a proper transpose
+    img = FileIO.load(file_path)  # Returns a Matrix or IndirectArray
 
+    # If the image is an IndirectArray, materialize it into a standard array
+    if img isa IndirectArrays.IndirectArray
+        @debug("Materializing IndirectArray into a standard array...")
+        img = img.values[img.index]
+    end
+
+    # Transpose the image to match OpenGL's coordinate system
+    img = permutedims(img)  # Swap dimensions 1 and 2 for proper orientation
 
     # Create a GLAbstraction texture
     texture = GLA.Texture(img; minfilter=:linear, magfilter=:linear, x_repeat=:clamp_to_edge, y_repeat=:clamp_to_edge)
