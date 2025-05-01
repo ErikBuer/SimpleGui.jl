@@ -58,44 +58,38 @@ end
 # Load the texture from an image file
 tex = load_texture("test/images/logo.png")  # Replace with the path to your image file
 
-# Create a rectangle mesh using GeometryBasics
-# Create a rectangle mesh manually
-vertices = [
-    Point2f(-1, -1),
-    Point2f(1, -1),
-    Point2f(-1, 1),
-    Point2f(1, 1)
-]
+function draw_image(tex::GLAbstraction.Texture, program::GLAbstraction.Program)
+    # Define rectangle vertices
+    vertices = [
+        Point2f(-1, -1),  # Bottom-left
+        Point2f(1, -1),   # Bottom-right
+        Point2f(-1, 1),   # Top-left
+        Point2f(1, 1)     # Top-right
+    ]
 
-texturecoordinates = [
-    Vec{2,Float32}(0.0f0, 1.0f0),  # Bottom-left
-    Vec{2,Float32}(1.0f0, 1.0f0),  # Bottom-right
-    Vec{2,Float32}(0.0f0, 0.0f0),  # Top-left
-    Vec{2,Float32}(1.0f0, 0.0f0)   # Top-right
-]
+    # Define texture coordinates
+    texturecoordinates = [
+        Vec{2,Float32}(0.0f0, 1.0f0),  # Bottom-left
+        Vec{2,Float32}(1.0f0, 1.0f0),  # Bottom-right
+        Vec{2,Float32}(0.0f0, 0.0f0),  # Top-left
+        Vec{2,Float32}(1.0f0, 0.0f0)   # Top-right
+    ]
 
-indices = TriangleFace{OffsetInteger{-1,UInt32}}[
-    TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(1), OffsetInteger{-1,UInt32}(2), OffsetInteger{-1,UInt32}(4))),  # First triangle
-    TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(4), OffsetInteger{-1,UInt32}(3), OffsetInteger{-1,UInt32}(1)))   # Second triangle
-]
+    # Define indices for two triangles forming the rectangle
+    indices = TriangleFace{OffsetInteger{-1,UInt32}}[
+        TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(1), OffsetInteger{-1,UInt32}(2), OffsetInteger{-1,UInt32}(4))),  # First triangle
+        TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(4), OffsetInteger{-1,UInt32}(3), OffsetInteger{-1,UInt32}(1)))   # Second triangle
+    ]
 
-# Create a Vertex Array Object (VAO)
-vao = GLA.VertexArray(
-    GLA.generate_buffers(
-        program,
-        vertices=vertices,
-        GLA.GEOMETRY_DIVISOR,
-        texturecoordinates=texturecoordinates
-    ),
-    indices
-)
-
-# Set the clear color
-glClearColor(0, 0, 0, 1)
-
-# Main rendering loop
-while !GLFW.WindowShouldClose(window)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    # Generate buffers and create a Vertex Array Object (VAO)
+    vao = GLA.VertexArray(
+        GLA.generate_buffers(
+            program,
+            vertices=vertices,
+            texturecoordinates=texturecoordinates
+        ),
+        indices
+    )
 
     # Bind the shader program
     GLA.bind(program)
@@ -106,6 +100,20 @@ while !GLFW.WindowShouldClose(window)
     # Bind the VAO and draw the rectangle
     GLA.bind(vao)
     GLA.draw(vao)
+
+    # Unbind the VAO and shader program
+    GLA.unbind(vao)
+    GLA.unbind(program)
+end
+
+# Set the clear color
+glClearColor(0, 0, 0, 1)
+
+# Main rendering loop
+while !GLFW.WindowShouldClose(window)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    draw_image(tex, program)
 
     # Swap buffers and poll events
     GLFW.SwapBuffers(window)
