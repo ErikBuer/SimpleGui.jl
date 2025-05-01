@@ -26,34 +26,44 @@ GLFW.MakeContextCurrent(window)
 GLA.set_context!(window)
 
 # Vertex Shader
-const vert = GLA.vert"""
+const vertex_shader = GLA.vert"""
 #version 330 core
+layout(location = 0) in vec2 position;
+layout(location = 1) in vec4 color;
+layout(location = 2) in vec2 texcoord;
 
-in vec2 vertices;
-in vec2 texturecoordinates; // must be this name, because collect_for_gl assumes them
+out vec4 v_color;
+out vec2 v_texcoord;
 
-out vec2 f_uv;
 void main() {
-    f_uv = texturecoordinates;
-    gl_Position = vec4(vertices, 0.0, 1.0);
+    gl_Position = vec4(position, 0.0, 1.0);
+    v_color = color;
+    v_texcoord = texcoord;
 }
 """
 
 # Fragment Shader
-const frag = GLA.frag"""
+const fragment_shader = GLA.frag"""
 #version 330 core
+in vec4 v_color;
+in vec2 v_texcoord;
 
-out vec4 outColor;
+out vec4 FragColor;
+
 uniform sampler2D image;
-in vec2 f_uv;
+uniform bool use_texture;
 
 void main() {
-    outColor = texture(image, f_uv);
+    if (use_texture) {
+        FragColor = texture(image, v_texcoord);
+    } else {
+        FragColor = v_color;
+    }
 }
 """
 
 # Compile the shader program
-program = GLA.Program(vert, frag)
+program = GLA.Program(vertex_shader, fragment_shader)
 
 # Function to load a texture from an image file
 function load_texture(file_path::String)::GLAbstraction.Texture
@@ -61,10 +71,6 @@ function load_texture(file_path::String)::GLAbstraction.Texture
     img = FileIO.load(file_path)  # Returns a Matrix{RGBA{N0f8}}
     # Transpose the image to match OpenGL's coordinate system and materialize it as a proper array
     img = permutedims(img)  # Swap dimensions 1 and 2 for a proper transpose
-
-    # Debug: Check the image properties
-    println("Image size: ", size(img))
-    println("Image type: ", typeof(img))
 
 
     # Create a GLAbstraction texture
@@ -83,16 +89,8 @@ function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::Abstrac
     width_ndc = px_to_ndc(width_px * scale, window_info.width_px)
     height_ndc = px_to_ndc(height_px * scale, window_info.height_px)
 
-
-    vertices = [
-        Point2f(-1, -1),  # Bottom-left
-        Point2f(1, -1),   # Bottom-right
-        Point2f(-1, 1),   # Top-left
-        Point2f(1, 1)     # Top-right
-    ]
-
-    # Define rectangle vertices and texture coordinates
-    vertices = [
+    # Define rectangle vertices
+    positions = [
         Point2f(x, y),                          # Bottom-left
         Point2f(x + width_ndc, y),              # Bottom-right
         Point2f(x, y + height_ndc),             # Top-left
@@ -117,14 +115,17 @@ function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::Abstrac
     vao = GLA.VertexArray(
         GLA.generate_buffers(
             program,
-            vertices=vertices,
-            texturecoordinates=texturecoordinates
+            position=positions,
+            texcoord=texturecoordinates
         ),
         indices
     )
 
     # Bind the shader program
     GLA.bind(program)
+
+    # Set the `use_texture` uniform to true
+    GLA.gluniform(program, :use_texture, true)
 
     # Bind the texture to the shader's sampler2D uniform
     GLA.gluniform(program, :image, 0, texture)
