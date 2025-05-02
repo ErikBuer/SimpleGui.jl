@@ -1,7 +1,7 @@
 include("SimpleGui.jl")
 using .SimpleGui
 
-using GeometryBasics
+using GeometryBasics, ColorTypes
 
 function main()
     # Initialize the window
@@ -10,23 +10,20 @@ function main()
     # Initialize shaders
     SimpleGui.initialize_shaders()
 
-    # TODO Currently a primary component is needed, covering the whole window
-    main_container = SimpleGui._Container(-1.0, -1.0, 2.0, 2.0)
-    main_container.layout.padding_px = 0.0
 
     top_bar = DockedContainer()
     top_bar.layout.docking = DockTop
-    push!(main_container.children, top_bar)
+    register_component(top_bar)
 
 
     side_bar = DockedContainer()
     side_bar.layout.docking = DockLeft
-    push!(main_container.children, side_bar)
+    register_component(side_bar)
 
 
     # Create a container
     container = SimpleGui._Container(-0.5, -0.5, 1.0, 1.0)
-    container.style.background_color = Vec4(0.3, 0.3, 0.6, 1.0)
+    set_color(container, ColorTypes.RGB(0.3, 0.3, 0.6))
 
     # Register event listeners
     register_event(container, OnClick, () -> println("Container clicked!"))
@@ -35,21 +32,19 @@ function main()
 
     # Create child components
     child1 = SimpleGui._Container(0.0, 0.0, 0.4, 0.4)
-    child1.style.background_color = Vec4(0.6, 0.3, 0.3, 1.0)
+    set_color(child1, Vec4(0.6, 0.3, 0.3, 1.0))
     child2 = SimpleGui._Container(0.0, 0.0, 0.2, 0.2)
-    child2.style.background_color = Vec4(0.3, 0.6, 0.3, 1.0)
+    set_color(child2, ColorTypes.RGBA(0.3, 0.6, 0.3, 1.0))
 
     # Add children to the parent
     push!(container.children, child1)
     push!(container.children, child2)
 
-    push!(main_container.children, container)
-
-    # Register the containers
-    register_component(main_container)
+    register_component(container)
 
     # Run the GUI
     SimpleGui.run(window)
 end
+
 
 main()

@@ -1,5 +1,7 @@
 # Utilities for GUI components
 
+using OffsetArrays
+
 """
     generate_rectangle_vertices(x, y, width, height)
 
@@ -78,6 +80,85 @@ function draw_rectangle(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFl
     # Unbind the VAO and shader program
     GLA.unbind(vao)
     GLA.unbind(prog[])
+end
+
+function load_texture(file_path::String)::GLAbstraction.Texture
+    # Load the image using FileIO
+    img = FileIO.load(file_path)  # Returns a Matrix or IndirectArray
+
+    # If the image is an IndirectArray, materialize it into a standard array
+    if img isa IndirectArrays.IndirectArray
+        @debug("Materializing IndirectArray into a standard array...")
+        img = img.values[img.index]
+    end
+
+    # Transpose the image to match OpenGL's coordinate system
+    img = permutedims(img)  # Swap dimensions 1 and 2 for proper orientation
+
+    # Create a GLAbstraction texture
+    texture = GLA.Texture(img; minfilter=:linear, magfilter=:linear, x_repeat=:clamp_to_edge, y_repeat=:clamp_to_edge)
+
+    return texture
+end
+
+function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::AbstractFloat; scale::AbstractFloat=1.0)
+    global window_info
+
+    # Get the image size from the texture
+    width_px, height_px = GLA.size(texture)
+
+    # Convert image size to normalized device coordinates (NDC)
+    width_ndc = px_to_ndc(width_px * scale, window_info.width_px)
+    height_ndc = px_to_ndc(height_px * scale, window_info.height_px)
+
+    # Define rectangle vertices
+    positions = [
+        Point2f(x, y),                          # Bottom-left
+        Point2f(x + width_ndc, y),              # Bottom-right
+        Point2f(x, y + height_ndc),             # Top-left
+        Point2f(x + width_ndc, y + height_ndc)  # Top-right
+    ]
+
+    # Define texture coordinates
+    texturecoordinates = [
+        Vec{2,Float32}(0.0f0, 1.0f0),  # Bottom-left
+        Vec{2,Float32}(1.0f0, 1.0f0),  # Bottom-right
+        Vec{2,Float32}(0.0f0, 0.0f0),  # Top-left
+        Vec{2,Float32}(1.0f0, 0.0f0)   # Top-right
+    ]
+
+    # Define indices for two triangles forming the rectangle
+    indices = TriangleFace{OffsetInteger{-1,UInt32}}[
+        TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(1), OffsetInteger{-1,UInt32}(2), OffsetInteger{-1,UInt32}(4))),  # First triangle
+        TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(4), OffsetInteger{-1,UInt32}(3), OffsetInteger{-1,UInt32}(1)))   # Second triangle
+    ]
+
+    # Generate buffers and create a Vertex Array Object (VAO)
+    vao = GLA.VertexArray(
+        GLA.generate_buffers(
+            program,
+            position=positions,
+            texcoord=texturecoordinates
+        ),
+        indices
+    )
+
+    # Bind the shader program
+    GLA.bind(program)
+
+    # Set the `use_texture` uniform to true
+    GLA.gluniform(program, :use_texture, true)
+
+    # Bind the texture to the shader's sampler2D uniform
+    GLA.gluniform(program, :image, 0, texture)
+
+    # Bind the VAO and draw the rectangle
+    GLA.bind(vao)
+    GLA.draw(vao)
+
+    # Unbind the VAO and shader program
+    GLA.unbind(vao)
+    GLA.unbind(program)
 end
 
 """

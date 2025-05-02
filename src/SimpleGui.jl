@@ -3,7 +3,7 @@ module SimpleGui
 using ModernGL, GLAbstraction, GLFW # OpenGL dependencies
 const GLA = GLAbstraction
 
-using GeometryBasics
+using GeometryBasics, ColorTypes    # Additional rendering dependencies
 
 include("shader.jl")
 export initialize_shaders, prog
@@ -30,20 +30,33 @@ export ComponentState, get_state
 
 include("components.jl")
 
+"""
+Primary container for the GUI application.
+
+This is the main container that holds all other components.
+
+Its primary purpose is to be a reference for docking and layout calculations.
+"""
+global main_container = _Container(-1.0, -1.0, 2.0, 2.0)
+main_container.layout.padding_px = 0.0
+set_color(main_container, ColorTypes.RGBA(0.0, 0.0, 0.0, 0.0))
+
+"""
+    register_component(component::AbstractGuiComponent)
+
+Register a GUI component to the global list of components.
+This function is used to keep track of all components (on the top level) that need to be rendered and updated.
+"""
+function register_component(component::AbstractGuiComponent)
+    push!(main_container.children, component)
+end
+
 
 # Create a global instance of the window info
 global window_info = WindowInfo(800, 600, nothing)
 
 global mouse_state
 mouse_state = MouseState(Dict(GLFW.MOUSE_BUTTON_LEFT => IsReleased, GLFW.MOUSE_BUTTON_RIGHT => IsReleased), 0.0, 0.0)
-
-"""
-    global components::Vector{AbstractGuiComponent}
-
-A global vector to hold all registered GUI components.
-This is used to keep track of all components (on the top level) that need to be rendered and updated.
-"""
-global components = AbstractGuiComponent[]
 
 
 """
@@ -65,10 +78,7 @@ function run(window)
         # Centralized event handling
         handle_events(mouse_state)
 
-        # Render all registered components
-        for component in components
-            render(component)
-        end
+        render(main_container)
 
         # Swap buffers and poll events
         GLFW.SwapBuffers(window)

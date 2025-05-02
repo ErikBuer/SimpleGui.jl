@@ -1,21 +1,20 @@
-mutable struct ContainerStyle
+mutable struct ButtonStyle
     background_color::Vec4{<:AbstractFloat} #RGBA color
     border_color::Vec4{<:AbstractFloat} #RGBA color
     border_width_px::Float32
 end
 
-function ContainerStyle(;
+function ButtonStyle(;
     background_color=Vec4{Float32}(0.8f0, 0.8f0, 0.8f0, 1.0f0),
     border_color=Vec4{Float32}(0.0f0, 0.0f0, 0.0f0, 1.0f0),
     border_width_px=1.0f0)
-    return ContainerStyle(background_color, border_color, border_width_px)
+    return ButtonStyle(background_color, border_color, border_width_px)
 end
 
 """
-The `Container` struct represents a GUI component that can contain other components.
-It is the most basic building block of the GUI system.
+The `Container` struct represents a button component that can contain other components.
 """
-mutable struct Container <: AbstractAlignedComponent
+mutable struct Button <: AbstractAlignedComponent
     x::Float32          # X position in NDC. Calculated value, not user input
     y::Float32          # Y position in NDC. Calculated value, not user input
     width::Float32      # Width in NDC. Calculated value, not user input
@@ -27,25 +26,25 @@ mutable struct Container <: AbstractAlignedComponent
 end
 
 # Constructor for internal use
-function _Container(x, y, width, height, children=Vector{AbstractGuiComponent}())
-    return Container(x, y, width, height, children, ComponentState(), ContainerStyle(), AlignedLayout())
+function _Button(x, y, width, height, children=Vector{AbstractGuiComponent}())
+    return Button(x, y, width, height, children, ComponentState(), ContainerStyle(), AlignedLayout())
 end
 
 """
 Container constructor.
 """
-function Container()
-    return Container(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ContainerStyle(), AlignedLayout())
+function Button()
+    return Button(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ContainerStyle(), AlignedLayout())
 end
 
-function handle_click(container::Container, mouse_state::MouseState)
-    state = get_state(container)
+function handle_click(component::Button, mouse_state::MouseState)
+    state = get_state(component)
 
-    if inside_rectangular_component(container, mouse_state)
+    if inside_rectangular_component(component, mouse_state)
         if mouse_state.button_state[GLFW.MOUSE_BUTTON_LEFT] == IsPressed
             if !state.is_clicked
                 state.is_clicked = true
-                dispatch_event(container, OnClick)
+                dispatch_event(component, OnClick)
             end
         elseif state.is_clicked
             state.is_clicked = false
@@ -53,12 +52,12 @@ function handle_click(container::Container, mouse_state::MouseState)
     end
 end
 
-function handle_mouse_enter(container::Container, mouse_state::MouseState)
-    state = get_state(container)
-    if inside_rectangular_component(container, mouse_state)
+function handle_mouse_enter(component::Container, mouse_state::MouseState)
+    state = get_state(component)
+    if inside_rectangular_component(component, mouse_state)
         if !state.is_hovered
             state.is_hovered = true
-            dispatch_event(container, OnMouseEnter, mouse_state)
+            dispatch_event(component, OnMouseEnter, mouse_state)
         end
     else
         if state.is_hovered
@@ -67,53 +66,54 @@ function handle_mouse_enter(container::Container, mouse_state::MouseState)
     end
 end
 
-function handle_mouse_leave(container::Container, mouse_state::MouseState)
-    state = get_state(container)
-    if !(inside_rectangular_component(container, mouse_state))
+function handle_mouse_leave(component::Container, mouse_state::MouseState)
+    state = get_state(component)
+    if !(inside_rectangular_component(component, mouse_state))
         if state.is_hovered
             state.is_hovered = false
-            dispatch_event(container, OnMouseLeave, mouse_state)
+            dispatch_event(component, OnMouseLeave, mouse_state)
         end
     end
 end
 
-function handle_mouse_over(container::Container, mouse_state::MouseState)
-    state = get_state(container)
+function handle_mouse_over(component::Container, mouse_state::MouseState)
+    state = get_state(component)
 
-    # Check if the mouse is inside the container's bounds
-    if inside_rectangular_component(container, mouse_state)
+    # Check if the mouse is inside the component's bounds
+    if inside_rectangular_component(component, mouse_state)
         # Dispatch the OnMouseOver event
-        dispatch_event(container, OnMouseOver, mouse_state)
+        dispatch_event(component, OnMouseOver, mouse_state)
     end
 end
 
-function render(container::Container)
+function render(component::Container)
     # Apply layout to position child components
-    apply_layout(container)
+    apply_layout(component)
 
     # Fetch the window dimensions from the global window_info
     window_width_px = window_info.width_px
     window_height_px = window_info.height_px
 
     # Extract style properties
-    bg_color = container.style.background_color
-    border_color = container.style.border_color
-    border_width_px = container.style.border_width_px
+    bg_color = component.style.background_color
+    border_color = component.style.border_color
+    border_width_px = component.style.border_width_px
+
 
     # Convert border width from pixels to NDC
     # border_width_x = px_to_ndc(border_width_px, window_width_px)
     # border_width_y = px_to_ndc(border_width_px, window_height_px)
 
     # Convert padding from pixels to NDC
-    padding_px = container.layout.padding_px
+    padding_px = component.layout.padding_px
     padding_x = px_to_ndc(padding_px, window_width_px)
     padding_y = px_to_ndc(padding_px, window_height_px)
 
-    # Adjust container dimensions for padding
-    padded_x = container.x + padding_x
-    padded_y = container.y + padding_y
-    padded_width = container.width - 2 * padding_x
-    padded_height = container.height - 2 * padding_y
+    # Adjust component dimensions for padding
+    padded_x = component.x + padding_x
+    padded_y = component.y + padding_y
+    padded_width = component.width - 2 * padding_x
+    padded_height = component.height - 2 * padding_y
 
     # Generate vertices for the main rectangle
     vertex_positions = generate_rectangle_vertices(
@@ -128,7 +128,7 @@ function render(container::Container)
     end
 
     # Render child components
-    for child in container.children
+    for child in component.children
         render(child)
     end
 end

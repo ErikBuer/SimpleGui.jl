@@ -1,5 +1,5 @@
-@enum Alignement StackVertical StackHorizontal AlignCenter                  # TODO change to just alignements, stacking is something else
-@enum SizeRule FillParentVertical FillParentHorizontal FillParentArea
+@enum Alignement AlignCenter
+@enum SizeRule FillParentHorizontal FillParentVertical FillParentArea SizeToContent Fixed
 @enum Docking DockTop DockBottom DockLeft DockRight
 
 @enum Axis begin
@@ -17,7 +17,7 @@ mutable struct AlignedLayout
     padding_px::Float32     # TODO fix
 end
 
-function AlignedLayout(; alignement=StackVertical, size_rule=FillParentHorizontal, padding_px=10.0)
+function AlignedLayout(; alignement=AlignCenter, size_rule=FillParentArea, padding_px=0.0)
     return AlignedLayout(alignement, size_rule, padding_px)
 end
 
@@ -51,10 +51,6 @@ function apply_layout(component::AbstractGuiComponent)
     parent_width = component.width
     parent_height = component.height
     layout = component.layout
-
-    # Track the current position for stacking
-    current_x = parent_x
-    current_y = parent_y + parent_height
 
     for child in component.children
 
@@ -118,18 +114,7 @@ function apply_layout(component::AbstractGuiComponent)
             child.height = parent_height - 2 * child_padding_y
         end
 
-        # Position the child based on alignement
-        if layout.alignement == StackVertical
-            # Stack children vertically
-            child.x = parent_x + child_padding_x
-            current_y -= child.height + child_padding_y
-            child.y = current_y
-        elseif layout.alignement == StackHorizontal
-            # Stack children horizontally
-            child.y = parent_y + child_padding_y
-            child.x = current_x
-            current_x += child.width + child_padding_x
-        elseif layout.alignement == AlignCenter
+        if layout.alignement == AlignCenter
             # Center the child horizontally and vertically
             child.x = parent_x + (parent_width - child.width) / 2
             child.y = parent_y + (parent_height - child.height) / 2

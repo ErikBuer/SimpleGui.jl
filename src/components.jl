@@ -1,6 +1,9 @@
 include("components/container.jl")
 export Container
 
+include("components/button.jl")
+export Button
+
 include("components/scroll_bar.jl")
 export ScrollBar
 
