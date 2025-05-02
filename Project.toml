@@ -13,3 +13,10 @@ ImageCore = "a09fc81d-aa75-5fe9-8630-4744c3626534"
 IndirectArrays = "9b13fd28-a010-5f03-acff-a1bbcff69959"
 ModernGL = "66fc600b-dfda-50eb-8b99-91cfa97b1301"
 OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
+
+[extras]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "Documenter"]
