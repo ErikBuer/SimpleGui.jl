@@ -72,7 +72,7 @@ function set_color(component::AbstractGuiComponent, color::AbstractVector{<:Real
         # If only RGB is provided, set alpha to 1.0
         color = [color; 1.0]
     end
-    component.style.background_color = color
+    component.style.background_color = Vec4(color...)
 end
 
 function set_color(component::AbstractGuiComponent, color::ColorTypes.RGBA{<:AbstractFloat})

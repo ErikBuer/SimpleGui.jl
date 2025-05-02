@@ -12,7 +12,7 @@ function ButtonStyle(;
 end
 
 """
-The `Container` struct represents a button component that can contain other components.
+The `Button` struct represents a button component that can contain other components.
 """
 mutable struct Button <: AbstractAlignedComponent
     x::Float32          # X position in NDC. Calculated value, not user input
@@ -21,20 +21,20 @@ mutable struct Button <: AbstractAlignedComponent
     height::Float32     # Width in NDC. Calculated value, not user input
     children::Vector{AbstractGuiComponent}  # Child components
     state::ComponentState
-    style::ContainerStyle
+    style::ButtonStyle
     layout::AlignedLayout
 end
 
 # Constructor for internal use
 function _Button(x, y, width, height, children=Vector{AbstractGuiComponent}())
-    return Button(x, y, width, height, children, ComponentState(), ContainerStyle(), AlignedLayout())
+    return Button(x, y, width, height, children, ComponentState(), ButtonStyle(), AlignedLayout())
 end
 
 """
-Container constructor.
+Button constructor.
 """
 function Button()
-    return Button(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ContainerStyle(), AlignedLayout())
+    return Button(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ButtonStyle(), AlignedLayout())
 end
 
 function handle_click(component::Button, mouse_state::MouseState)
@@ -52,7 +52,7 @@ function handle_click(component::Button, mouse_state::MouseState)
     end
 end
 
-function handle_mouse_enter(component::Container, mouse_state::MouseState)
+function handle_mouse_enter(component::Button, mouse_state::MouseState)
     state = get_state(component)
     if inside_rectangular_component(component, mouse_state)
         if !state.is_hovered
@@ -66,7 +66,7 @@ function handle_mouse_enter(component::Container, mouse_state::MouseState)
     end
 end
 
-function handle_mouse_leave(component::Container, mouse_state::MouseState)
+function handle_mouse_leave(component::Button, mouse_state::MouseState)
     state = get_state(component)
     if !(inside_rectangular_component(component, mouse_state))
         if state.is_hovered
@@ -76,7 +76,7 @@ function handle_mouse_leave(component::Container, mouse_state::MouseState)
     end
 end
 
-function handle_mouse_over(component::Container, mouse_state::MouseState)
+function handle_mouse_over(component::Button, mouse_state::MouseState)
     state = get_state(component)
 
     # Check if the mouse is inside the component's bounds
@@ -86,7 +86,7 @@ function handle_mouse_over(component::Container, mouse_state::MouseState)
     end
 end
 
-function render(component::Container)
+function render(component::Button)
     # Apply layout to position child components
     apply_layout(component)
 

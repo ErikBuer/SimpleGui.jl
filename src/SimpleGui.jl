@@ -30,6 +30,8 @@ export ComponentState, get_state
 
 include("components.jl")
 
+include("test_utilitites.jl")
+
 """
 Primary container for the GUI application.
 
