@@ -1,8 +1,13 @@
 using SimpleGui
-
 using ColorTypes
 
-function main()
+using TestItems
+
+
+
+@testitem "Generate Container" begin
+    using ColorTypes
+
     # Initialize the window (or headless context)
     window = initialize_window("Headless GUI Example", (400, 300))
 
@@ -12,7 +17,7 @@ function main()
     register_component(container)
 
     # Save the screenshot using offscreen rendering
-    SimpleGui.save_screenshot_offscreen("test_screenshot.png", 400, 300)
+    SimpleGui.save_screenshot_offscreen("test_output/test_screenshot.png", 400, 300)
 end
 
-main()
+

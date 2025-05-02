@@ -33,8 +33,10 @@ end
 """
 Button constructor.
 """
-function Button()
-    return Button(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ButtonStyle(), AlignedLayout())
+function Button(button_text::String)
+    return Button(0.2, 0.2, 0.2, 0.2, AbstractGuiComponent[], ComponentState(), ButtonStyle(), AlignedLayout(size_rule=SizeToContent))
+
+
 end
 
 function handle_click(component::Button, mouse_state::MouseState)
