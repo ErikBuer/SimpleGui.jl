@@ -39,7 +39,7 @@ Its primary purpose is to be a reference for docking and layout calculations.
 """
 global main_container = _Container(-1.0, -1.0, 2.0, 2.0)
 main_container.layout.padding_px = 0.0
-main_container.style.background_color = Vec4(0.0, 0.0, 0.0, 0.0)
+set_color(main_container, ColorTypes.RGBA(0.0, 0.0, 0.0, 0.0))
 
 """
     register_component(component::AbstractGuiComponent)

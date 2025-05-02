@@ -12,8 +12,8 @@ include("gui_component/utilities.jl")
 
 include("gui_component/layout.jl")
 export AlignedLayout, DockedLayout
-export Alignement, StackVertical, StackHorizontal, AlignCenter
-export SizeRule, FillParentVertical, FillParentHorizontal, FillParentArea
+export Alignement, AlignCenter
+export SizeRule, FillParentHorizontal, FillParentVertical, FillParentArea, SizeToContent, Fixed
 export Docking, DockTop, DockBottom, DockLeft, DockRight
 export set_color
 
@@ -75,9 +75,9 @@ function set_color(component::AbstractGuiComponent, color::AbstractVector{<:Real
     component.style.background_color = color
 end
 
-function set_color(component::AbstractGuiComponent, color::ColorTypes.RGBA)
+function set_color(component::AbstractGuiComponent, color::ColorTypes.RGBA{<:AbstractFloat})
     # Convert RGBA to Vec4
-    color_vec = Vec4(color.r, color.g, color.b, color.a)
+    color_vec = Vec4(color.r, color.g, color.b, color.alpha)
     component.style.background_color = color_vec
 end
 
