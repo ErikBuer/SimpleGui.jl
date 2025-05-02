@@ -1,5 +1,7 @@
 # Docked Container
 
+`DockedContainer` is a component for creating top bars and sidebars, Navbar, and the like.
+
 ``` @example DockedCointainer
 using SimpleGui
 
