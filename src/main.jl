@@ -7,9 +7,6 @@ function main()
     # Initialize the window
     window = initialize_window("Simple GUI Example", (1920, 1080))
 
-    # Initialize shaders
-    SimpleGui.initialize_shaders()
-
 
     top_bar = DockedContainer()
     top_bar.layout.docking = DockTop

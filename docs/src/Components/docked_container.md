@@ -6,10 +6,6 @@ using SimpleGui
 # Initialize the window
 window = initialize_window("Simple GUI Example", (400, 300))
 
-# Initialize shaders
-SimpleGui.initialize_shaders()
-
-
 top_bar = DockedContainer()
 top_bar.layout.docking = DockTop
 register_component(top_bar)
