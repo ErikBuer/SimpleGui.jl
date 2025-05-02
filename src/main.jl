@@ -1,7 +1,7 @@
 include("SimpleGui.jl")
 using .SimpleGui
 
-using GeometryBasics, ColorTypes
+using ColorTypes
 
 function main()
     # Initialize the window
@@ -32,7 +32,7 @@ function main()
 
     # Create child components
     child1 = SimpleGui._Container(0.0, 0.0, 0.4, 0.4)
-    set_color(child1, Vec4(0.6, 0.3, 0.3, 1.0))
+    set_color(child1, [0.6, 0.3, 0.3, 1.0])
     child2 = SimpleGui._Container(0.0, 0.0, 0.2, 0.2)
     set_color(child2, ColorTypes.RGBA(0.3, 0.6, 0.3, 1.0))
 

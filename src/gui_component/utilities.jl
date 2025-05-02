@@ -180,7 +180,9 @@ end
 Convert NDC scale to pixels.
 
 ```jldoctest
-julia> ndc_to_px(0.5, 800)
+julia> using SimpleGui
+
+julia> SimpleGui.ndc_to_px(0.5, 800)
 200.0
 ```
 """
@@ -194,7 +196,9 @@ end
 Convert pixel to NDC scale.
 
 ```jldoctest
-julia> px_to_ndc(200.0, 800)
+julia> using SimpleGui
+
+julia> SimpleGui.px_to_ndc(200.0, 800)
 0.5
 ```
 """

@@ -30,7 +30,7 @@ mutable struct DockedLayout
     size_px::Float32        # Fixed size (width for vertical docking, height for horizontal docking)
 end
 
-function DockedLayout(; docking=DockLeft, size_px=300.0)
+function DockedLayout(; docking=DockLeft, size_px=60.0)
     return DockedLayout(docking, size_px)
 end
 
