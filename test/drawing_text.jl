@@ -4,6 +4,7 @@ const GLA = GLAbstraction
 using GeometryBasics
 using FreeTypeAbstraction
 using ColorTypes
+using OffsetArrays
 
 mutable struct WindowInfo
     width_px::Integer
@@ -106,10 +107,14 @@ function render_text(text::String, x::AbstractFloat, y::AbstractFloat, font_face
     # Load the texture directly from the matrix
     texture = load_texture_from_matrix(img)
 
-    # Define the quad vertices for the text
+    # Calculate the aspect ratio of the canvas
     aspect_ratio = canvas_width / canvas_height
-    quad_width = 0.5  # Adjust as needed
-    quad_height = quad_width / aspect_ratio
+
+    # Define the quad dimensions based on the canvas
+    quad_width = 1.0  # Full width in NDC
+    quad_height = quad_width / aspect_ratio  # Maintain aspect ratio
+
+    # Define the quad vertices (in NDC)
     quad_vertices = [
         Point2f(x, y),                          # Bottom-left
         Point2f(x + quad_width, y),             # Bottom-right
@@ -117,25 +122,28 @@ function render_text(text::String, x::AbstractFloat, y::AbstractFloat, font_face
         Point2f(x + quad_width, y + quad_height) # Top-right
     ]
 
-    # Define the texture coordinates
+    # Define the texture coordinates (covering the entire texture)
     texturecoordinates = [
-        Vec{2,Float32}(0.0f0, 1.0f0),  # Bottom-left
-        Vec{2,Float32}(1.0f0, 1.0f0),  # Bottom-right
-        Vec{2,Float32}(0.0f0, 0.0f0),  # Top-left
-        Vec{2,Float32}(1.0f0, 0.0f0)   # Top-right
+        Vec{2,Float32}(0.0f0, 1.0f0),
+        Vec{2,Float32}(1.0f0, 1.0f0),
+        Vec{2,Float32}(0.0f0, 0.0f0),
+        Vec{2,Float32}(1.0f0, 0.0f0)
     ]
 
-    # Flatten the quad vertices and texture coordinates into vectors
-    quad_vertices_vec = reshape(quad_vertices, :)  # Flatten into a Vector
-    texturecoordinates_vec = reshape(texturecoordinates, :)  # Flatten into a Vector
+    # Define indices for two triangles forming the rectangle
+    indices = TriangleFace{OffsetInteger{-1,UInt32}}[
+        TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(1), OffsetInteger{-1,UInt32}(2), OffsetInteger{-1,UInt32}(4))),  # First triangle
+        TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(4), OffsetInteger{-1,UInt32}(3), OffsetInteger{-1,UInt32}(1)))   # Second triangle
+    ]
 
     # Create buffers and VAO
     vao = GLA.VertexArray(
         GLA.generate_buffers(
             program,
-            position=quad_vertices_vec,
-            texcoord=texturecoordinates_vec
-        )
+            position=quad_vertices,
+            texcoord=texturecoordinates
+        ),
+        indices
     )
 
     # Bind the shader program
@@ -163,7 +171,7 @@ if font_face === nothing
     error("Font not found!")
 end
 
-font_size = 48
+font_size = 100
 
 # Main rendering loop
 glClearColor(0.0, 0.0, 0.0, 1.0)
@@ -171,7 +179,7 @@ while !GLFW.WindowShouldClose(window)
     glClear(GL_COLOR_BUFFER_BIT)
 
     # Render text
-    render_text("Test text", 0.0, 0.0, font_face, font_size, Vec4(1.0f0, 1.0f0, 1.0f0, 1.0f0))
+    render_text("Test text", -1.0, -1.0, font_face, font_size, Vec4(1.0f0, 1.0f0, 1.0f0, 1.0f0))
 
     # Swap buffers and poll events
     GLFW.SwapBuffers(window)
