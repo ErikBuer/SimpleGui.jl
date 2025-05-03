@@ -158,7 +158,7 @@ while !GLFW.WindowShouldClose(window)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     # Draw the image at position (0.0, 0.0)
-    draw_image(tex, 0.0f0, 0.0f0)
+    draw_image(tex, -1.0f0, -1.0f0, scale=0.2f0)
 
     # Swap buffers and poll events
     GLFW.SwapBuffers(window)
