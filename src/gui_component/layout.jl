@@ -14,7 +14,7 @@ This struct defines the layout properties for a GUI component, including the lay
 mutable struct AlignedLayout
     alignement::Alignement
     size_rule::SizeRule
-    padding_px::Float32     # TODO fix
+    padding_px::Float32
 end
 
 function AlignedLayout(; alignement=AlignCenter, size_rule=FillParentArea, padding_px=0.0)

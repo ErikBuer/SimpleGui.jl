@@ -1,6 +1,6 @@
 # Utilities for GUI components
 
-using OffsetArrays
+using OffsetArrays, IndirectArrays
 
 """
     generate_rectangle_vertices(x, y, width, height)
@@ -136,7 +136,7 @@ function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::Abstrac
     # Generate buffers and create a Vertex Array Object (VAO)
     vao = GLA.VertexArray(
         GLA.generate_buffers(
-            program,
+            prog[],
             position=positions,
             texcoord=texturecoordinates
         ),
@@ -144,13 +144,13 @@ function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::Abstrac
     )
 
     # Bind the shader program
-    GLA.bind(program)
+    GLA.bind(prog[])
 
     # Set the `use_texture` uniform to true
-    GLA.gluniform(program, :use_texture, true)
+    GLA.gluniform(prog[], :use_texture, true)
 
     # Bind the texture to the shader's sampler2D uniform
-    GLA.gluniform(program, :image, 0, texture)
+    GLA.gluniform(prog[], :image, 0, texture)
 
     # Bind the VAO and draw the rectangle
     GLA.bind(vao)
@@ -158,7 +158,7 @@ function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::Abstrac
 
     # Unbind the VAO and shader program
     GLA.unbind(vao)
-    GLA.unbind(program)
+    GLA.unbind(prog[])
 end
 
 """

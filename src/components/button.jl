@@ -23,6 +23,8 @@ mutable struct Button <: AbstractAlignedComponent
     state::ComponentState
     style::ButtonStyle
     layout::AlignedLayout
+    text::String
+    text_style::TextStyle
 end
 
 # Constructor for internal use
