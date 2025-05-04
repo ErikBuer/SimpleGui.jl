@@ -5,7 +5,7 @@ const GLA = GLAbstraction
 
 using GeometryBasics, ColorTypes    # Additional rendering dependencies
 
-include("shader.jl")
+include("shaders.jl")
 export initialize_shaders, prog
 
 include("mouse.jl")
