@@ -30,3 +30,12 @@ function initialize_window(window_name::String="Simple GUI", resolution::Tuple{I
 
     return window
 end
+
+function update_window_size(window)
+    global window_info
+    window_info.width_px, window_info.height_px = GLFW.GetFramebufferSize(window)
+
+    global main_container
+    main_container.width = window_info.width_px
+    main_container.height = window_info.height_px
+end

@@ -14,10 +14,10 @@ end
 
 mutable struct Text <: AbstractGuiComponent
     text::String
-    x::Float32              # X position in NDC. Calculated value, not user input
-    y::Float32              # Y position in NDC. Calculated value, not user input
-    width::Float32          # Width in NDC. Calculated value, not user input
-    height::Float32         # Height in NDC. Calculated value, not user input
+    x::Float32              # X position in pixels. Calculated value, not user input
+    y::Float32              # Y position in pixels. Calculated value, not user input
+    width::Float32          # Width in pixels. Calculated value, not user input
+    height::Float32         # Height in pixels. Calculated value, not user input
     style::TextStyle
 end
 

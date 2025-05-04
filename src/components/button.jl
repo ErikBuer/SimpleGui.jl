@@ -15,10 +15,10 @@ end
 The `Button` struct represents a button component that can contain other components.
 """
 mutable struct Button <: AbstractAlignedComponent
-    x::Float32          # X position in NDC. Calculated value, not user input
-    y::Float32          # Y position in NDC. Calculated value, not user input
-    width::Float32      # Width in NDC. Calculated value, not user input
-    height::Float32     # Width in NDC. Calculated value, not user input
+    x::Float32          # X position in pixels. Calculated value, not user input
+    y::Float32          # Y position in pixels. Calculated value, not user input
+    width::Float32      # Width in pixels. Calculated value, not user input
+    height::Float32     # Width in pixels. Calculated value, not user input
     children::Vector{AbstractGuiComponent}  # Child components
     state::ComponentState
     style::ButtonStyle

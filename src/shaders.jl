@@ -1,21 +1,29 @@
-# Vertex Shader
 const vertex_shader = GLA.vert"""
 #version 330 core
-layout(location = 0) in vec2 position;
+layout(location = 0) in vec2 position; // Position in pixels
 layout(location = 1) in vec4 color;
 layout(location = 2) in vec2 texcoord;
 
 out vec4 v_color;
 out vec2 v_texcoord;
 
+uniform mat4 projection; // Projection matrix
+
 void main() {
-    gl_Position = vec4(position, 0.0, 1.0);
+    // Transform position from pixels to NDC using the projection matrix
+    //gl_Position = vec4(position / vec2(1920.0, 1080.0) * 2.0 - 1.0, 0.0, 1.0);
+    //gl_Position = vec4(position, 0.0, 1.0);
+    //gl_Position = projection * vec4(position, 0.0, 1.0);
+
+
+    mat4 identity = mat4(1.0);
+    gl_Position = projection * vec4(position, 0.0, 1.0);
+
     v_color = color;
     v_texcoord = texcoord;
 }
 """
 
-# Fragment Shader
 const fragment_shader = GLA.frag"""
 #version 330 core
 in vec4 v_color;

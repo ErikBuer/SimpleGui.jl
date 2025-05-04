@@ -50,71 +50,67 @@ function apply_layout(component::AbstractGuiComponent)
     parent_y = component.y
     parent_width = component.width
     parent_height = component.height
-    layout = component.layout
 
     for child in component.children
-
         if isa(child, AbstractDockedComponent)
-
-            # Apply docking layout and adjust parent dimensions for following children
+            # Apply docking layout
             if child.layout.docking == DockTop
-                size_ndc = px_to_ndc(child.layout.size_px, window_info.height_px)
+                size_px = child.layout.size_px
 
                 child.x = parent_x
-                child.y = parent_y + parent_height - size_ndc
+                child.y = parent_y
                 child.width = parent_width
-                child.height = size_ndc
+                child.height = size_px
 
-                parent_height -= size_ndc
+                parent_y += size_px
+                parent_height -= size_px
             elseif child.layout.docking == DockBottom
-                size_ndc = px_to_ndc(child.layout.size_px, window_info.height_px)
+                size_px = child.layout.size_px
 
                 child.x = parent_x
-                child.y = parent_y
+                child.y = parent_y + parent_height - size_px
                 child.width = parent_width
-                child.height = size_ndc
+                child.height = size_px
 
-                parent_height -= size_ndc
-                parent_y += size_ndc
+                parent_height -= size_px
             elseif child.layout.docking == DockLeft
-                size_ndc = px_to_ndc(child.layout.size_px, window_info.width_px)
+                size_px = child.layout.size_px
 
                 child.x = parent_x
                 child.y = parent_y
-                child.width = size_ndc
+                child.width = size_px
                 child.height = parent_height
 
-                parent_width -= size_ndc
-                parent_x += size_ndc
+                parent_x += size_px
+                parent_width -= size_px
             elseif child.layout.docking == DockRight
-                size_ndc = px_to_ndc(child.layout.size_px, window_info.width_px)
+                size_px = child.layout.size_px
 
-                child.x = parent_x + parent_width - size_ndc
+                child.x = parent_x + parent_width - size_px
                 child.y = parent_y
-                child.width = size_ndc
+                child.width = size_px
                 child.height = parent_height
 
-                parent_width -= size_ndc
+                parent_width -= size_px
             end
 
-            continue  # Skip to the next iteration for docked components
+            continue
         end
 
-        child_padding_x = px_to_ndc(child.layout.padding_px, window_info.width_px)
-        child_padding_y = px_to_ndc(child.layout.padding_px, window_info.height_px)
-
         # Adjust child size based on size_rule
+        child_padding_x = child.layout.padding_px
+        child_padding_y = child.layout.padding_px
+
         if child.layout.size_rule == FillParentHorizontal
             child.width = parent_width - 2 * child_padding_x
         elseif child.layout.size_rule == FillParentVertical
             child.height = parent_height - 2 * child_padding_y
         elseif child.layout.size_rule == FillParentArea
-            # Fill both width and height of the parent
             child.width = parent_width - 2 * child_padding_x
             child.height = parent_height - 2 * child_padding_y
         end
 
-        if layout.alignement == AlignCenter
+        if component.layout.alignement == AlignCenter
             # Center the child horizontally and vertically
             child.x = parent_x + (parent_width - child.width) / 2
             child.y = parent_y + (parent_height - child.height) / 2

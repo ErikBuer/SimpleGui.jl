@@ -19,10 +19,11 @@ function main()
 
 
     # Create a container
-    container = SimpleGui._Container(-0.5, -0.5, 1.0, 1.0)
+    container = SimpleGui.Container()
     set_color(container, ColorTypes.RGB(0.3, 0.3, 0.6))
 
     # Register event listeners
+
     register_event(container, OnClick, () -> println("Container clicked!"))
     register_event(container, OnMouseEnter, (mouse_state) -> println("Mouse entered at ($(mouse_state.x), $(mouse_state.y))"))
 
@@ -34,8 +35,8 @@ function main()
     set_color(child2, ColorTypes.RGBA(0.3, 0.6, 0.3, 1.0))
 
     # Add children to the parent
-    push!(container.children, child1)
-    push!(container.children, child2)
+    #push!(container.children, child1)
+    #push!(container.children, child2)
 
     register_component(container)
 

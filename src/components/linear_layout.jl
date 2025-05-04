@@ -1,18 +1,18 @@
 mutable struct VerticalLayout <: AbstractGuiComponent
-    x::Float32          # X position in NDC. Calculated value, not user input
-    y::Float32          # Y position in NDC. Calculated value, not user input
-    width::Float32      # Width in NDC. Calculated value, not user input
-    height::Float32     # Width in NDC. Calculated value, not user input
+    x::Float32          # X position in pixels. Calculated value, not user input
+    y::Float32          # Y position in pixels. Calculated value, not user input
+    width::Float32      # Width in pixels. Calculated value, not user input
+    height::Float32     # Width in pixels. Calculated value, not user input
     spacing::Float32    # Spacing between child components in pixels
     padding::Float32    # Padding around the layout in pixels
     children::Vector{AbstractGuiComponent}
 end
 
 mutable struct HorizontalLayout <: AbstractGuiComponent
-    x::Float32          # X position in NDC. Calculated value, not user input
-    y::Float32          # Y position in NDC. Calculated value, not user input
-    width::Float32      # Width in NDC. Calculated value, not user input
-    height::Float32     # Width in NDC. Calculated value, not user input
+    x::Float32          # X position in pixels. Calculated value, not user input
+    y::Float32          # Y position in pixels. Calculated value, not user input
+    width::Float32      # Width in pixels. Calculated value, not user input
+    height::Float32     # Width in pixels. Calculated value, not user input
     spacing::Float32    # Spacing between child components in pixels
     padding::Float32    # Padding around the layout in pixels
     children::Vector{AbstractGuiComponent}

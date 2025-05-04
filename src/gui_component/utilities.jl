@@ -5,20 +5,17 @@ using OffsetArrays, IndirectArrays
 """
     generate_rectangle_vertices(x, y, width, height)
 
-Function to generate a rectangle with specified position, and size.
+Function to generate a rectangle with specified position and size in pixel coordinates.
 
-This function creates a rectangle defined by its bottom-left corner (x, y), width, and height.
-It returns the vertices needed to render the rectangle.
+This function creates a rectangle defined by its top-left corner (x, y), width, and height.
 """
 function generate_rectangle_vertices(x, y, width, height)::Vector{Point{2,Float32}}
-    # Define the vertices for the rectangle in counterclockwise order
     vertices = Point{2,Float32}[
-        Point{2,Float32}(x, y),                    # Bottom-left
-        Point{2,Float32}(x + width, y),            # Bottom-right
-        Point{2,Float32}(x + width, y + height),   # Top-right
-        Point{2,Float32}(x, y + height)            # Top-left
+        Point{2,Float32}(x, y),                    # Top-left
+        Point{2,Float32}(x, y + height),           # Bottom-left
+        Point{2,Float32}(x + width, y + height),   # Bottom-right
+        Point{2,Float32}(x + width, y),            # Top-right   
     ]
-
     return vertices
 end
 
@@ -73,6 +70,12 @@ function draw_rectangle(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFl
     # Bind the shader program and VAO
     GLA.bind(prog[])
     GLA.bind(vao)
+
+    # Ensure the shader's `use_texture` uniform is set to `false`
+    GLA.gluniform(prog[], :use_texture, false)
+
+    global projection_matrix
+    GLA.gluniform(prog[], :projection, projection_matrix)
 
     # Draw the rectangle using the VAO
     GLA.draw(vao)
