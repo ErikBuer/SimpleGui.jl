@@ -104,36 +104,50 @@ function load_texture(file_path::String)::GLAbstraction.Texture
     return texture
 end
 
-function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::AbstractFloat; scale::AbstractFloat=1.0)
+function draw_image(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::AbstractFloat; scale::AbstractFloat=1.0)
     global window_info
 
-    # Get the image size from the texture
-    width_px, height_px = GLA.size(texture)
+    println("x_px ", x_px, "y_px ", y_px)
 
-    # Convert image size to normalized device coordinates (NDC)
-    width_ndc = px_to_ndc(width_px * scale, window_info.width_px)
-    height_ndc = px_to_ndc(height_px * scale, window_info.height_px)
+    println("window width ", window_info.width_px, " window height ", window_info.height_px)
+
+    # Get the image size from the texture
+    width_px, height_px = Float32.(GLA.size(texture))
+    println("Image size: ", width_px, "x", height_px)
+
+
+    scaled_width_px = width_px * scale
+    scaled_height_px = height_px * scale
+    println("Scaled size: ", scaled_width_px, "x", scaled_height_px)
 
     # Define rectangle vertices
     positions = [
-        Point2f(x, y),                          # Bottom-left
-        Point2f(x + width_ndc, y),              # Bottom-right
-        Point2f(x, y + height_ndc),             # Top-left
-        Point2f(x + width_ndc, y + height_ndc)  # Top-right
+        Point2f(x_px, y_px + scaled_height_px),                   # Bottom-left
+        Point2f(x_px + scaled_width_px, y_px + scaled_height_px), # Bottom-right
+        Point2f(x_px + scaled_width_px, y_px),                    # Top-right
+        Point2f(x_px, y_px),                                      # Top-left
     ]
 
     # Define texture coordinates
     texturecoordinates = [
-        Vec{2,Float32}(0.0f0, 1.0f0),  # Bottom-left
-        Vec{2,Float32}(1.0f0, 1.0f0),  # Bottom-right
-        Vec{2,Float32}(0.0f0, 0.0f0),  # Top-left
-        Vec{2,Float32}(1.0f0, 0.0f0)   # Top-right
+        Vec{2,Float32}(0.0f0, 0.0f0),  # Bottom-left
+        Vec{2,Float32}(1.0f0, 0.0f0),  # Bottom-right
+        Vec{2,Float32}(1.0f0, 1.0f0),  # Top-right
+        Vec{2,Float32}(0.0f0, 1.0f0),  # Top-left
     ]
 
+    """
     # Define indices for two triangles forming the rectangle
     indices = TriangleFace{OffsetInteger{-1,UInt32}}[
         TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(1), OffsetInteger{-1,UInt32}(2), OffsetInteger{-1,UInt32}(4))),  # First triangle
         TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(4), OffsetInteger{-1,UInt32}(3), OffsetInteger{-1,UInt32}(1)))   # Second triangle
+    ]
+    """
+
+    # Define the elements (two triangles forming the rectangle)
+    indices = NgonFace{3,UInt32}[
+        (0, 1, 2),  # First triangle: bottom-left, bottom-right, top-right
+        (2, 3, 0)   # Second triangle: top-right, top-left, bottom-left
     ]
 
     # Generate buffers and create a Vertex Array Object (VAO)
@@ -154,6 +168,9 @@ function draw_image(texture::GLAbstraction.Texture, x::AbstractFloat, y::Abstrac
 
     # Bind the texture to the shader's sampler2D uniform
     GLA.gluniform(prog[], :image, 0, texture)
+
+    global projection_matrix
+    GLA.gluniform(prog[], :projection, projection_matrix)
 
     # Bind the VAO and draw the rectangle
     GLA.bind(vao)

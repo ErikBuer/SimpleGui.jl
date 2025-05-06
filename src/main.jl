@@ -29,9 +29,9 @@ function main()
 
 
     # Create child components
-    child1 = SimpleGui._Container(0.0, 0.0, 0.4, 0.4)
+    child1 = SimpleGui.Container()
     set_color(child1, [0.6, 0.3, 0.3, 1.0])
-    child2 = SimpleGui._Container(0.0, 0.0, 0.2, 0.2)
+    child2 = SimpleGui.Container()
     set_color(child2, ColorTypes.RGBA(0.3, 0.6, 0.3, 1.0))
 
     # Add children to the parent

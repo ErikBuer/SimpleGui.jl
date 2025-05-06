@@ -11,12 +11,6 @@ uniform mat4 projection; // Projection matrix
 
 void main() {
     // Transform position from pixels to NDC using the projection matrix
-    //gl_Position = vec4(position / vec2(1920.0, 1080.0) * 2.0 - 1.0, 0.0, 1.0);
-    //gl_Position = vec4(position, 0.0, 1.0);
-    //gl_Position = projection * vec4(position, 0.0, 1.0);
-
-
-    mat4 identity = mat4(1.0);
     gl_Position = projection * vec4(position, 0.0, 1.0);
 
     v_color = color;

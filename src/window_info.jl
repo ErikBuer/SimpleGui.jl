@@ -10,7 +10,7 @@ function framebuffer_size_callback(window, width_px, height_px)
     window_info.height_px = height_px
 end
 
-function initialize_window(window_name::String="Simple GUI", resolution::Tuple{Int,Int}=(800, 600))
+function initialize_window(window_name::String="Simple GUI", resolution::Tuple{Int,Int}=(400, 300))
     window = GLFW.Window(name=window_name, resolution=resolution)
     GLA.set_context!(window)
     GLFW.MakeContextCurrent(window)
@@ -27,6 +27,8 @@ function initialize_window(window_name::String="Simple GUI", resolution::Tuple{I
     GLFW.SetMouseButtonCallback(window, mouse_button_callback)
 
     initialize_shaders()
+
+    update_projection_matrix()
 
     return window
 end
