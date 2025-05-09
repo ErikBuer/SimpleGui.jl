@@ -41,7 +41,7 @@ Its primary purpose is to be a reference for docking and layout calculations.
 """
 global main_container = Container()
 main_container.layout.padding_px = 0.0
-set_color(main_container, ColorTypes.RGBA(0.0, 1.0, 0.0, 1.0))  # TODO make transparent
+set_color(main_container, ColorTypes.RGBA(0.0, 0.0, 0.0, 0.0))
 
 """
     register_component(component::AbstractGuiComponent)

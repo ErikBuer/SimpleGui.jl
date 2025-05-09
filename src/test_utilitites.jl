@@ -35,6 +35,10 @@ function save_screenshot_offscreen(output_file::String, width::Int, height::Int)
     # Set the viewport to match the framebuffer size
     ModernGL.glViewport(0, 0, width, height)
 
+    # Update the projection matrix to match the framebuffer size
+    global projection_matrix
+    projection_matrix = SimpleGui.get_orthographic_matrix(0.0f0, Float32(width), Float32(height), 0.0f0, -1.0f0, 1.0f0)
+
     # Clear the framebuffer
     ModernGL.glClear(ModernGL.GL_COLOR_BUFFER_BIT)
 
