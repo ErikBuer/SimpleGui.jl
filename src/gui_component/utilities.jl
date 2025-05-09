@@ -95,9 +95,6 @@ function load_texture(file_path::String)::GLAbstraction.Texture
         img = img.values[img.index]
     end
 
-    # Transpose the image to match OpenGL's coordinate system
-    img = permutedims(img)  # Swap dimensions 1 and 2 for proper orientation
-
     # Create a GLAbstraction texture
     texture = GLA.Texture(img; minfilter=:linear, magfilter=:linear, x_repeat=:clamp_to_edge, y_repeat=:clamp_to_edge)
 
@@ -107,18 +104,12 @@ end
 function draw_image(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::AbstractFloat; scale::AbstractFloat=1.0)
     global window_info
 
-    println("x_px ", x_px, "y_px ", y_px)
-
-    println("window width ", window_info.width_px, " window height ", window_info.height_px)
-
     # Get the image size from the texture
     width_px, height_px = Float32.(GLA.size(texture))
-    println("Image size: ", width_px, "x", height_px)
 
 
     scaled_width_px = width_px * scale
     scaled_height_px = height_px * scale
-    println("Scaled size: ", scaled_width_px, "x", scaled_height_px)
 
     # Define rectangle vertices
     positions = [
@@ -130,19 +121,11 @@ function draw_image(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::A
 
     # Define texture coordinates
     texturecoordinates = [
-        Vec{2,Float32}(0.0f0, 0.0f0),  # Bottom-left
         Vec{2,Float32}(1.0f0, 0.0f0),  # Bottom-right
         Vec{2,Float32}(1.0f0, 1.0f0),  # Top-right
-        Vec{2,Float32}(0.0f0, 1.0f0),  # Top-left
+        Vec{2,Float32}(0.0f0, 1.0f0),  # Top-left    
+        Vec{2,Float32}(0.0f0, 0.0f0),  # Bottom-left
     ]
-
-    """
-    # Define indices for two triangles forming the rectangle
-    indices = TriangleFace{OffsetInteger{-1,UInt32}}[
-        TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(1), OffsetInteger{-1,UInt32}(2), OffsetInteger{-1,UInt32}(4))),  # First triangle
-        TriangleFace{OffsetInteger{-1,UInt32}}((OffsetInteger{-1,UInt32}(4), OffsetInteger{-1,UInt32}(3), OffsetInteger{-1,UInt32}(1)))   # Second triangle
-    ]
-    """
 
     # Define the elements (two triangles forming the rectangle)
     indices = NgonFace{3,UInt32}[
