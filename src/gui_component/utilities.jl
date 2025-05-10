@@ -47,11 +47,11 @@ function draw_closed_lines(vertices::Vector{Point2f}, color_rgba::Vec4{<:Abstrac
 end
 
 """
-    draw_rectangle(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFloat})
+    draw_rectangle(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFloat}, projection_matrix::Mat4{Float32})
 
 Draw a rectangle using the provided vertices and color.
 """
-function draw_rectangle(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFloat})
+function draw_rectangle(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFloat}, projection_matrix::Mat4{Float32})
     # Generate a uniform color array for all vertices
     colors = Vec{4,Float32}[color_rgba for _ in 1:4]
 
@@ -73,8 +73,6 @@ function draw_rectangle(vertices::Vector{Point2f}, color_rgba::Vec4{<:AbstractFl
 
     # Ensure the shader's `use_texture` uniform is set to `false`
     GLA.gluniform(prog[], :use_texture, false)
-
-    global projection_matrix
     GLA.gluniform(prog[], :projection, projection_matrix)
 
     # Draw the rectangle using the VAO
@@ -101,8 +99,7 @@ function load_texture(file_path::String)::GLAbstraction.Texture
     return texture
 end
 
-function draw_image(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::AbstractFloat; scale::AbstractFloat=1.0)
-    global window_info
+function draw_image(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::AbstractFloat, projection_matrix::Mat4{Float32}; scale::AbstractFloat=1.0)
 
     # Get the image size from the texture
     width_px, height_px = Float32.(GLA.size(texture))
@@ -152,7 +149,6 @@ function draw_image(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::A
     # Bind the texture to the shader's sampler2D uniform
     GLA.gluniform(prog[], :image, 0, texture)
 
-    global projection_matrix
     GLA.gluniform(prog[], :projection, projection_matrix)
 
     # Bind the VAO and draw the rectangle

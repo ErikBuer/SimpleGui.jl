@@ -5,17 +5,17 @@ using ColorTypes
 
 function main()
     # Initialize the window
-    window = initialize_window("Simple GUI Example", (1920, 1080))
+    window_state = initialize_window("Simple GUI Example", 1920, 1080)
 
 
     top_bar = DockedContainer()
     top_bar.layout.docking = DockTop
-    register_component(top_bar)
+    register_component(window_state, top_bar)
 
 
     side_bar = DockedContainer()
     side_bar.layout.docking = DockLeft
-    register_component(side_bar)
+    register_component(window_state, side_bar)
 
 
     # Create a container
@@ -38,10 +38,10 @@ function main()
     #push!(container.children, child1)
     #push!(container.children, child2)
 
-    register_component(container)
+    register_component(window_state, container)
 
     # Run the GUI
-    SimpleGui.run(window)
+    SimpleGui.run(window_state)
 end
 
 

@@ -39,14 +39,6 @@ function dispatch_event(component::AbstractGuiComponent, event::MouseEvent, args
     end
 end
 
-
-function handle_events(mouse_state::MouseState)
-    for component in main_container.children
-        # Handle events for the component
-        handle_component_events(component, mouse_state)
-    end
-end
-
 function handle_component_events(component::AbstractGuiComponent, mouse_state::MouseState)
 
     # TODO

@@ -16,7 +16,7 @@ function DockedContainer()
     return DockedContainer(0.0, 0.0, 100.0, 100.0, AbstractGuiComponent[], ComponentState(), ContainerStyle(), DockedLayout())
 end
 
-function render(container::DockedContainer)
+function render(container::DockedContainer, projection_matrix::Mat4{Float32})
     # Apply layout to position child components
     apply_layout(container)
 
@@ -31,7 +31,7 @@ function render(container::DockedContainer)
     )
 
     # Draw the main rectangle (background)
-    draw_rectangle(vertex_positions, bg_color)
+    draw_rectangle(vertex_positions, bg_color, projection_matrix::Mat4{Float32})
 
     if 0.0 < border_width_px
         draw_closed_lines(vertex_positions, border_color)

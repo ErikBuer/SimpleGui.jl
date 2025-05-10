@@ -31,7 +31,7 @@ end
 
 function render(scrollbar::ScrollBar)
     # Render the scroll bar background
-    draw_rectangle(scrollbar.x, scrollbar.y, scrollbar.width, scrollbar.height, (0.8, 0.8, 0.8, 1.0))
+    draw_rectangle(scrollbar.x, scrollbar.y, scrollbar.width, scrollbar.height, [0.8, 0.8, 0.8, 1.0])
 
     # Calculate the handle's position and size
     if scrollbar.axis == Vertical
@@ -47,7 +47,7 @@ function render(scrollbar::ScrollBar)
     end
 
     # Render the handle
-    draw_rectangle(handle_x, handle_y, handle_width, handle_height, (0.5, 0.5, 0.5, 1.0))
+    draw_rectangle(handle_x, handle_y, handle_width, handle_height, [0.5, 0.5, 0.5, 1.0])
 end
 
 function handle_scroll_interaction(scrollbar::ScrollBar, mouse_state::MouseState)

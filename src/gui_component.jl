@@ -60,7 +60,7 @@ Responsibilities:
 
 This function assumes that `apply_layout` has already been called to calculate the positions and sizes.
 """
-function render(component::AbstractGuiComponent)
+function render(component::AbstractGuiComponent, projection_matrix::Mat4{Float32})
     error("render is not implemented for $(typeof(component))")
 end
 

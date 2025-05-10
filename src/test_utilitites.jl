@@ -25,7 +25,7 @@ function create_offscreen_framebuffer(width::Int, height::Int)
     return framebuffer[], texture[]
 end
 
-function save_screenshot_offscreen(output_file::String, width::Int, height::Int)
+function save_screenshot_offscreen(window_state::WindowState, output_file::String, width::Int, height::Int)
     # Create an offscreen framebuffer
     framebuffer, texture = create_offscreen_framebuffer(width, height)
 
@@ -36,14 +36,15 @@ function save_screenshot_offscreen(output_file::String, width::Int, height::Int)
     ModernGL.glViewport(0, 0, width, height)
 
     # Update the projection matrix to match the framebuffer size
-    global projection_matrix
-    projection_matrix = SimpleGui.get_orthographic_matrix(0.0f0, Float32(width), Float32(height), 0.0f0, -1.0f0, 1.0f0)
+    window_state.projection_matrix = SimpleGui.get_orthographic_matrix(
+        0.0f0, Float32(width), Float32(height), 0.0f0, -1.0f0, 1.0f0
+    )
 
     # Clear the framebuffer
     ModernGL.glClear(ModernGL.GL_COLOR_BUFFER_BIT)
 
-    # Render the scene
-    render(main_container)
+    # Render the main container
+    render(window_state.main_container, window_state.projection_matrix)
 
     # Read the pixels from the framebuffer
     buffer = Array{UInt8}(undef, 3, width, height)  # RGB format

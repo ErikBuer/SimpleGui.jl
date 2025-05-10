@@ -125,7 +125,7 @@ function render(component::Button)
     )
 
     # Draw the main rectangle (background)
-    draw_rectangle(vertex_positions, bg_color)
+    draw_rectangle(vertex_positions, bg_color, projection_matrix::Mat4{Float32})
 
     if 0.0 < border_width_px
         draw_closed_lines(vertex_positions, border_color)

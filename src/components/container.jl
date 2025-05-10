@@ -87,7 +87,7 @@ function handle_mouse_over(container::Container, mouse_state::MouseState)
     end
 end
 
-function render(container::Container)
+function render(container::Container, projection_matrix::Mat4{Float32})
     # Apply layout to position child components
     apply_layout(container)
 
@@ -109,7 +109,7 @@ function render(container::Container)
     )
 
     # Draw the main rectangle (background)
-    draw_rectangle(vertex_positions, bg_color)
+    draw_rectangle(vertex_positions, bg_color, projection_matrix::Mat4{Float32})
 
     if 0.0 < border_width_px
         draw_closed_lines(vertex_positions, border_color)
@@ -117,6 +117,6 @@ function render(container::Container)
 
     # Render child components
     for child in container.children
-        render(child)
+        render(child, projection_matrix)
     end
 end

@@ -8,16 +8,16 @@ using TestItems
     using ColorTypes
 
     # Initialize the window (or headless context)
-    window = initialize_window("", (400, 300))
-    SimpleGui.update_window_size(window) # Only needed for headless context
+    window_state = initialize_window("", 400, 300)
+    SimpleGui.update_window_size(window_state) # Only needed for headless context
 
     # Create and register components
     container = SimpleGui.Container()
     set_color(container, ColorTypes.RGB(0.3, 0.3, 0.6))
-    register_component(container)
+    register_component(window_state, container)
 
     # Save the screenshot using offscreen rendering
-    SimpleGui.save_screenshot_offscreen("test_output/test_screenshot.png", 400, 300)
+    SimpleGui.save_screenshot_offscreen(window_state, "test_output/test_screenshot.png", 400, 300)
 end
 
 
@@ -26,42 +26,43 @@ end
     const GLA = GLAbstraction
 
     # Initialize the window (or headless context)
-    window = initialize_window("", (1920, 1080))
-    SimpleGui.update_window_size(window) # Only needed for headless context
+    window_state = initialize_window("", 400, 300)
+    SimpleGui.update_window_size(window_state) # Only needed for headless context
 
 
     img = SimpleGui.load_texture("images/logo.png")
 
-    SimpleGui.draw_image(img, 0.0, 0.0, scale=0.2f0)
+    SimpleGui.draw_image(img, 0.0, 0.0, window_state.projection_matrix, scale=0.2f0)
 
     # Save the screenshot using offscreen rendering
-    SimpleGui.save_screenshot_offscreen("test_output/draw_image.png", 1920, 1080)
+    SimpleGui.save_screenshot_offscreen(window_state, "test_output/draw_image.png", 400, 300)
 end
 
 
 @testitem "Generate Text" begin
     # Initialize the window (or headless context)
-    window = initialize_window("", (400, 300))
+    window_state = initialize_window("", 400, 300)
+    SimpleGui.update_window_size(window_state) # Only needed for headless context
 
     # Create and register components
     button = SimpleGui.Text("Read Me")
-    register_component(button)
+    register_component(window_state, button)
 
     # Save the screenshot using offscreen rendering
-    SimpleGui.save_screenshot_offscreen("test_output/text_test.png", 400, 300)
+    SimpleGui.save_screenshot_offscreen(window_state, "test_output/text_test.png", 400, 300)
 end
 
 
 @testitem "Generate Text Button" begin
     # Initialize the window (or headless context)
-    window = initialize_window("", (400, 300))
+    window = initialize_window("", 400, 300)
 
     # Create and register components
     button = SimpleGui.Button("Click Me")
-    register_component(button)
+    register_component(window_state, button)
 
     # Save the screenshot using offscreen rendering
-    SimpleGui.save_screenshot_offscreen("test_output/text_button.png", 400, 300)
+    SimpleGui.save_screenshot_offscreen(window_state, "test_output/text_button.png", 400, 300)
 end
 
 

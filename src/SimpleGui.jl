@@ -11,9 +11,6 @@ export initialize_shaders, prog
 include("mouse.jl")
 export mouse_state, mouse_button_callback, ButtonState, IsPressed, IsReleased, MouseState
 
-include("window_info.jl")
-export initialize_window
-
 include("hooks.jl")
 export use_state
 
@@ -30,44 +27,10 @@ export ComponentState, get_state
 
 include("components.jl")
 
+include("window_state.jl")
+export WindowState, initialize_window
+
 include("test_utilitites.jl")
-
-"""
-Primary container for the GUI application.
-
-This is the main container that holds all other components.
-
-Its primary purpose is to be a reference for docking and layout calculations.
-"""
-global main_container = Container()
-main_container.layout.padding_px = 0.0
-set_color(main_container, ColorTypes.RGBA(0.0, 0.0, 0.0, 0.0))
-
-"""
-    register_component(component::AbstractGuiComponent)
-
-Register a GUI component to the global list of components.
-This function is used to keep track of all components (on the top level) that need to be rendered and updated.
-"""
-function register_component(component::AbstractGuiComponent)
-    push!(main_container.children, component)
-end
-
-
-# Create a global instance of the window info
-global window_info = WindowInfo(800, 600, nothing)
-
-global mouse_state
-mouse_state = MouseState(Dict(GLFW.MOUSE_BUTTON_LEFT => IsReleased, GLFW.MOUSE_BUTTON_RIGHT => IsReleased), 0.0, 0.0)
-
-
-
-
-# Update the viewport and projection matrix in the main loop
-function update_viewport()
-    global window_info
-    glViewport(0, 0, window_info.width_px, window_info.height_px)
-end
 
 
 """
@@ -96,12 +59,20 @@ function get_identity_matrix()
 end
 
 
-function update_projection_matrix()
-    global window_info
-    global projection_matrix
-    projection_matrix = get_orthographic_matrix(0.0f0, Float32(window_info.width_px), Float32(window_info.height_px), 0.0f0, -1.0f0, 1.0f0)
+function update_projection_matrix(window_state::WindowState)
+    window_state.projection_matrix = get_orthographic_matrix(0.0f0, Float32(window_state.width_px), Float32(window_state.height_px), 0.0f0, -1.0f0, 1.0f0)
 end
 
+
+"""
+    register_component(component::AbstractGuiComponent)
+
+Register a GUI component to the global list of components.
+This function is used to keep track of all components (on the top level) that need to be rendered and updated.
+"""
+function register_component(window_state::WindowState, component::AbstractGuiComponent)
+    push!(window_state.main_container.children, component)
+end
 
 """
     run(window)
@@ -109,35 +80,35 @@ end
 Run the main loop for the GUI application.
 This function handles the rendering and event processing for the GUI.
 """
-function run(window)
+function run(window_state::WindowState)
 
     ModernGL.glDisable(ModernGL.GL_CULL_FACE)
     ModernGL.glDisable(ModernGL.GL_DEPTH_TEST)
 
-    while !GLFW.WindowShouldClose(window)
-        update_window_size(window)
+    while !GLFW.WindowShouldClose(window_state.handle)
+        update_window_size(window_state)
 
-        update_viewport()
-        update_projection_matrix()
+        update_viewport(window_state)
+        update_projection_matrix(window_state)
 
         # Clear the screen
         ModernGL.glClear(ModernGL.GL_COLOR_BUFFER_BIT)
 
         # Update mouse position
-        mouse_state.x, mouse_state.y = GLFW.GetCursorPos(window)
+        window_state.mouse_state.x, window_state.mouse_state.y = GLFW.GetCursorPos(window_state.handle)
 
         # Centralized event handling
-        handle_events(mouse_state)
+        handle_events(window_state)
 
-        render(main_container)
+        render(window_state.main_container, window_state.projection_matrix::Mat4{Float32})
 
         # Swap buffers and poll events
-        GLFW.SwapBuffers(window)
+        GLFW.SwapBuffers(window_state.handle)
         GLFW.PollEvents()
     end
 
     # Clean up the window
-    GLFW.DestroyWindow(window)
+    GLFW.DestroyWindow(window_state.handle)
 end
 
 end
