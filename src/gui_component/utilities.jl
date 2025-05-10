@@ -2,6 +2,7 @@
 
 using OffsetArrays, IndirectArrays
 
+
 """
     generate_rectangle_vertices(x, y, width, height)
 
@@ -94,7 +95,29 @@ function load_texture(file_path::String)::GLAbstraction.Texture
     end
 
     # Create a GLAbstraction texture
-    texture = GLA.Texture(img; minfilter=:linear, magfilter=:linear, x_repeat=:clamp_to_edge, y_repeat=:clamp_to_edge)
+    texture = GLA.Texture(img;
+        minfilter=:linear,
+        magfilter=:linear,
+        x_repeat=:clamp_to_edge,
+        y_repeat=:clamp_to_edge
+    )
+
+    return texture
+end
+
+function create_sdf_texture(sdf_matrix::Matrix{Float64})::GLAbstraction.Texture
+    rows, cols = size(sdf_matrix)
+
+    # Convert SDF matrix to Float32 for OpenGL
+    sdf_data = Float32.(sdf_matrix)
+
+    # Create a GLAbstraction.Texture
+    texture = GLA.Texture(sdf_data;
+        minfilter=:linear,
+        magfilter=:linear,
+        x_repeat=:clamp_to_edge,
+        y_repeat=:clamp_to_edge
+    )
 
     return texture
 end
@@ -158,6 +181,68 @@ function draw_image(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::A
     # Unbind the VAO and shader program
     GLA.unbind(vao)
     GLA.unbind(prog[])
+end
+
+function draw_sdf_text(
+    sdf_texture::GLAbstraction.Texture,
+    x_px::Float32,
+    y_px::Float32,
+    width_px::Float32,
+    height_px::Float32,
+    projection_matrix::Mat4{Float32},
+    text_color::Vec{4,Float32}=Vec{4,Float32}(1.0, 1.0, 1.0, 1.0),
+    smoothing::Float32=0.05f0
+)
+    # Define rectangle vertices
+    positions = [
+        Point2f(x_px, y_px + height_px),            # Bottom-left
+        Point2f(x_px + width_px, y_px + height_px), # Bottom-right
+        Point2f(x_px + width_px, y_px),             # Top-right
+        Point2f(x_px, y_px),                        # Top-left
+    ]
+
+    # Define texture coordinates
+    texcoords = [
+        Vec{2,Float32}(0.0, 1.0),  # Bottom-left
+        Vec{2,Float32}(1.0, 1.0),  # Bottom-right
+        Vec{2,Float32}(1.0, 0.0),  # Top-right
+        Vec{2,Float32}(0.0, 0.0),  # Top-left
+    ]
+
+    # Define the elements (two triangles forming the rectangle)
+    indices = NgonFace{3,UInt32}[
+        (0, 1, 2),  # First triangle
+        (2, 3, 0)   # Second triangle
+    ]
+
+    # Generate buffers and create a Vertex Array Object (VAO)
+    vao = GLA.VertexArray(
+        GLA.generate_buffers(
+            sdf_prog[],
+            position=positions,
+            texcoord=texcoords
+        ),
+        indices
+    )
+
+    # Bind the SDF shader program
+    GLA.bind(sdf_prog[])
+
+    # Set uniforms
+    GLA.gluniform(sdf_prog[], :projection, projection_matrix)
+    GLA.gluniform(sdf_prog[], :text_color, text_color)
+    GLA.gluniform(sdf_prog[], :smoothing, smoothing)
+
+    # Bind the SDF texture
+    GLA.gluniform(sdf_prog[], :sdfTexture, 0, sdf_texture)
+
+    # Bind the VAO and draw the rectangle
+    GLA.bind(vao)
+    GLA.draw(vao)
+
+    # Unbind the VAO and shader program
+    GLA.unbind(vao)
+    GLA.unbind(sdf_prog[])
 end
 
 """

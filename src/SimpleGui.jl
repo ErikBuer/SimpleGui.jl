@@ -32,6 +32,8 @@ export WindowState, initialize_window
 
 include("test_utilitites.jl")
 
+include("text_processing.jl")   # TODO currently just for testing
+
 
 """
     get_orthographic_matrix(left::T, right::T, bottom::T, top::T, near::T, far::T)::Matrix{T} where {T<:Real}

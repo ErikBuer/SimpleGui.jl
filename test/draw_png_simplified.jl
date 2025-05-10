@@ -12,7 +12,7 @@ window_state = initialize_window("Simple GUI Example", 1920, 1080)
 file_path = "test/images/logo.png"
 
 # Load the texture from an image file
-tex = SimpleGui.load_texture(file_path)  # Replace with the path to your image file
+tex = SimpleGui.load_texture(file_path)
 
 # Set the clear color
 glClearColor(0, 0, 0, 1)

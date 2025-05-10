@@ -37,11 +37,49 @@ void main() {
 }
 """
 
+glyph_vertex_shader = GLA.vert"""
+#version 330 core
+layout(location = 0) in vec2 position; // Glyph position in pixels
+layout(location = 1) in vec2 texcoord; // Texture coordinates
+
+out vec2 v_texcoord;
+
+uniform mat4 projection; // Projection matrix
+
+void main() {
+    // Transform position from pixels to NDC using the projection matrix
+    gl_Position = projection * vec4(position, 0.0, 1.0);
+    v_texcoord = texcoord;
+}
+"""
+
+glyph_fragment_shader = GLA.frag"""
+#version 330 core
+in vec2 v_texcoord;
+out vec4 FragColor;
+
+uniform sampler2D sdfTexture;
+
+void main() {
+    // Sample the SDF texture
+    float sdfValue = texture(sdfTexture, v_texcoord).r;
+
+    // Map the SDF value to grayscale (or use a colormap)
+    FragColor = vec4(vec3(sdfValue), 1.0); // Grayscale output
+}
+"""
+
 
 # Global variable for the shader program
 const prog = Ref{GLA.Program}()
+const sdf_prog = Ref{GLA.Program}()
 
-# Initialize the shader program (must be called after OpenGL context is created)
+
+
+"""
+Initialize the shader program (must be called after OpenGL context is created)
+"""
 function initialize_shaders()
     prog[] = GLA.Program(vertex_shader, fragment_shader)
+    sdf_prog[] = GLA.Program(glyph_vertex_shader, glyph_fragment_shader)
 end
