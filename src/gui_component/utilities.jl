@@ -185,7 +185,7 @@ function draw_sdf_text(
     width_px::Float32,
     height_px::Float32,
     projection_matrix::Mat4{Float32},
-    text_color::Vec{4,Float32}=Vec{4,Float32}(1.0, 1.0, 1.0, 1.0),
+    text_color::Vec4{Float32}=Vec{4,Float32}(1.0, 1.0, 1.0, 1.0),
     smoothing::Float32=0.05f0
 )
     # Define rectangle vertices

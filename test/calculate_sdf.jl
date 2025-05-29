@@ -10,7 +10,7 @@ end
 
 # Define the character and pixel size
 char = '?'
-pixelsize = 64
+pixelsize = 32
 
 # Render the glyph and get its bitmap
 bitmap, extent = renderface(font_face, char, pixelsize)

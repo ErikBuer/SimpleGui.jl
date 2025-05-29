@@ -18,7 +18,7 @@ end
 
 # Define the character and pixel size
 char = '?'
-pixelsize = 32
+pixelsize = 192
 
 # Render the glyph and get its bitmap
 bitmap, extent = renderface(font_face, char, pixelsize)
@@ -27,7 +27,7 @@ width_px = Float32(extent.advance[1])  # Width
 height_px = Float32(extent.advance[2]) # Height
 
 # Convert the bitmap to a binary array for SDF calculation
-bitmap_bool = bitmap .> 128
+bitmap_bool = bitmap .> 0
 bitmap_bool_matrix = Matrix(bitmap_bool)
 
 # Calculate the SDF matrix
@@ -43,11 +43,11 @@ while !GLFW.WindowShouldClose(window_state.handle)
     # Draw the SDF text
     SimpleGui.draw_sdf_text(
         sdf_texture,
-        100.0f0, 100.0f0,  # x_px, y_px (Position in pixels)
-        width_px, height_px,  # Glyph size
+        100.0f0, 100.0f0,             # x_px, y_px (Position in pixels)
+        width_px / 2, height_px / 2,  # Glyph size
         window_state.projection_matrix,  # Projection matrix
-        Vec{4,Float32}(1.0, 1.0, 1.0, 1.0),  # text_color (White color)
-        0.05f0  # Smoothing factor
+        Vec{4,Float32}(1.0, 1.0, 0.0, 1.0),  # text_color
+        1f0  # Smoothing factor
     )
 
     # Swap buffers and poll events

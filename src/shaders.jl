@@ -37,7 +37,7 @@ void main() {
 }
 """
 
-glyph_vertex_shader = GLA.vert"""
+const glyph_vertex_shader = GLA.vert"""
 #version 330 core
 layout(location = 0) in vec2 position; // Glyph position in pixels
 layout(location = 1) in vec2 texcoord; // Texture coordinates
@@ -53,19 +53,24 @@ void main() {
 }
 """
 
-glyph_fragment_shader = GLA.frag"""
+const glyph_fragment_shader = GLA.frag"""
 #version 330 core
 in vec2 v_texcoord;
 out vec4 FragColor;
 
 uniform sampler2D sdfTexture;
+uniform vec4 text_color;  // Text color
+uniform float smoothing;  // Smoothing factor
 
 void main() {
     // Sample the SDF texture
     float sdfValue = texture(sdfTexture, v_texcoord).r;
 
-    // Map the SDF value to grayscale (or use a colormap)
-    FragColor = vec4(vec3(sdfValue), 1.0); // Grayscale output
+    // Apply smoothing to calculate alpha
+    float alpha = smoothstep(0.5 - smoothing, 0.5 + smoothing, sdfValue) * text_color.a;
+
+    // Set the fragment color using the text color and alpha
+    FragColor = vec4(text_color.rgb, alpha);
 }
 """
 

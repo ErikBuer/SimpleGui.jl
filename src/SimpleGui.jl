@@ -32,7 +32,7 @@ export WindowState, initialize_window
 
 include("test_utilitites.jl")
 
-include("text_processing.jl")   # TODO currently just for testing
+include("text_processing.jl")
 
 
 """

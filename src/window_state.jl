@@ -63,6 +63,10 @@ function initialize_window(window_name::String="SimpleGUI", window_width_px::Int
     GLA.set_context!(gl_window)
     GLFW.MakeContextCurrent(gl_window)
 
+    # Enable alpha blending using ModernGL
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
     initialize_shaders()
 
     # Initialize the main container
