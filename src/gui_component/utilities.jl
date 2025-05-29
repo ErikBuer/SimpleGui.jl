@@ -105,14 +105,9 @@ function load_texture(file_path::String)::GLAbstraction.Texture
     return texture
 end
 
-function create_sdf_texture(sdf_matrix::Matrix{Float64})::GLAbstraction.Texture
-    rows, cols = size(sdf_matrix)
-
-    # Convert SDF matrix to Float32 for OpenGL
-    sdf_data = Float32.(sdf_matrix)
-
+function create_sdf_texture(sdf_matrix::Matrix{Float32})::GLAbstraction.Texture
     # Create a GLAbstraction.Texture
-    texture = GLA.Texture(sdf_data;
+    texture = GLA.Texture(sdf_matrix;
         minfilter=:linear,
         magfilter=:linear,
         x_repeat=:clamp_to_edge,
