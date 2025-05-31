@@ -16,38 +16,20 @@ if font_face === nothing
     error("Font not found!")
 end
 
-# Define the character and pixel size
-char = '?'
-pixelsize = 192
-
-# Render the glyph and get its bitmap
-bitmap, extent = renderface(font_face, char, pixelsize)
-
-width_px = Float32(extent.advance[1])  # Width
-height_px = Float32(extent.advance[2]) # Height
-
-# Convert the bitmap to a binary array for SDF calculation
-bitmap_bool = bitmap .> 0
-bitmap_bool_matrix = Matrix(bitmap_bool)
-
-# Calculate the SDF matrix
-sdf_matrix = SimpleGui.calculate_signed_distance_field(bitmap_bool_matrix)
-
-# Create an OpenGL texture from the SDF matrix
-sdf_texture = SimpleGui.create_sdf_texture(sdf_matrix)
-
 # Main rendering loop
+text = "Hello, World!"
+pixelsize = 64  # Adjust pixel size for the text
+
 while !GLFW.WindowShouldClose(window_state.handle)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    # Draw the SDF text
-    SimpleGui.draw_text_sdf(
-        sdf_texture,
+    # Draw the text
+    SimpleGui.draw_text(
+        font_face,
+        text,
         100.0f0, 100.0f0,                   # x_px, y_px (Position in pixels)
-        12.0f0, 12.0f0,                     # Glyph size
+        pixelsize,                          # Pixel size for the font
         window_state.projection_matrix,     # Projection matrix
-        Vec{4,Float32}(1.0, 1.0, 0.0, 1.0), # text_color
-        1f0  # Smoothing factor
     )
 
     # Swap buffers and poll events

@@ -2,6 +2,7 @@ module SimpleGui
 
 using ModernGL, GLAbstraction, GLFW # OpenGL dependencies
 const GLA = GLAbstraction
+using FreeTypeAbstraction # Font rendering dependencies
 
 using GeometryBasics, ColorTypes    # Additional rendering dependencies
 
