@@ -90,34 +90,23 @@ function handle_mouse_over(component::Button, mouse_state::MouseState)
     end
 end
 
-function render(component::Button)
+function render(component::Button, projection_matrix::Mat4{Float32})
     # Apply layout to position child components
     apply_layout(component)
 
-    # Fetch the window dimensions from the global window_info
-    window_width_px = window_info.width_px
-    window_height_px = window_info.height_px
 
     # Extract style properties
     bg_color = component.style.background_color
     border_color = component.style.border_color
     border_width_px = component.style.border_width_px
-
-
-    # Convert border width from pixels to NDC
-    # border_width_x = px_to_ndc(border_width_px, window_width_px)
-    # border_width_y = px_to_ndc(border_width_px, window_height_px)
-
-    # Convert padding from pixels to NDC
     padding_px = component.layout.padding_px
-    padding_x = px_to_ndc(padding_px, window_width_px)
-    padding_y = px_to_ndc(padding_px, window_height_px)
+
 
     # Adjust component dimensions for padding
     padded_x = component.x + padding_x
     padded_y = component.y + padding_y
-    padded_width = component.width - 2 * padding_x
-    padded_height = component.height - 2 * padding_y
+    padded_width = component.width - 2 * padding_px
+    padded_height = component.height - 2 * padding_px
 
     # Generate vertices for the main rectangle
     vertex_positions = generate_rectangle_vertices(
