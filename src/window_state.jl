@@ -16,7 +16,7 @@ mutable struct WindowState
     width_px::Integer
     height_px::Integer
     handle::Union{GLFW.Window,Nothing}
-    main_container::Container
+    root_view::AbstractView  # Root of the UI tree
     mouse_state::MouseState
     projection_matrix::Mat4{Float32}
 end
@@ -44,13 +44,13 @@ function mouse_button_callback(window_state::WindowState, gl_window, button, act
 end
 
 """
-    initialize_window(window_name::String="SimpleGUI", window_width_px::Integer, window_height_px::Integer)::WindowState
+    initialize_window(root_view::AbstractView; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)::WindowState
 
 Create and initialize a new `WindowState` instance with default values.
 
 # Arguments
 
-- `window_name::String`: The name of the window. Default is "SimpleGUI".
+- `title::String`: The name of the window. Default is "SimpleGUI".
 - `window_width_px::Integer`: The width of the window in pixels.
 - `window_height_px::Integer`: The height of the window in pixels.
 
@@ -58,8 +58,8 @@ Create and initialize a new `WindowState` instance with default values.
 
 - `WindowState`: A new instance of `WindowState` with the specified window size and default values for other fields.
 """
-function initialize_window(window_name::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)::WindowState
-    gl_window = GLFW.Window(name=window_name, resolution=(window_width_px, window_height_px))
+function initialize_window(root_view::AbstractView; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)::WindowState
+    gl_window = GLFW.Window(name=title, resolution=(window_width_px, window_height_px))
     GLA.set_context!(gl_window)
     GLFW.MakeContextCurrent(gl_window)
 
@@ -68,11 +68,6 @@ function initialize_window(window_name::String="SimpleGUI", window_width_px::Int
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     initialize_shaders()
-
-    # Initialize the main container
-    main_container = Container()
-    main_container.layout.padding_px = 0.0
-    set_color(main_container, ColorTypes.RGBA(0.0, 0.0, 0.0, 0.0))
 
     # Initialize the mouse state
     mouse_state = MouseState(
@@ -86,7 +81,7 @@ function initialize_window(window_name::String="SimpleGUI", window_width_px::Int
         0.0f0, Float32(window_width_px), Float32(window_height_px), 0.0f0, -1.0f0, 1.0f0
     )
 
-    window_state = WindowState(window_width_px, window_height_px, gl_window, main_container, mouse_state, projection_matrix)
+    window_state = WindowState(window_width_px, window_height_px, gl_window, root_view, mouse_state, projection_matrix)
 
     _framebuffer_size_callback(gl_window, width_px::Int, height_px::Int) = framebuffer_size_callback(window_state, gl_window, width_px, height_px)
     _mouse_button_callback(gl_window, button, action, mods) = mouse_button_callback(window_state, gl_window, button, action, mods)
@@ -101,10 +96,6 @@ end
 
 function update_window_size(window_state::WindowState)
     window_state.width_px, window_state.height_px = GLFW.GetFramebufferSize(window_state.handle)
-
-
-    window_state.main_container.width = window_state.width_px
-    window_state.main_container.height = window_state.height_px
 end
 
 # Update the viewport and projection matrix in the main loop

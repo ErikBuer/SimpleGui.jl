@@ -1,3 +1,5 @@
+abstract type AbstractView end
+
 abstract type AbstractGuiComponent end
 """
 DockedContainer are docked to a specific side (e.g., left, right, top, bottom) and typically have fixed sizes in one dimension (e.g., width for vertical docking).
@@ -49,6 +51,12 @@ function handle_mouse_up(component::AbstractGuiComponent, mouse_state::MouseStat
     error("handle_mouse_up is not implemented for $(typeof(component))")
 end
 
+
+function interpret_view(component::AbstractView, x::Float32, y::Float32, width::Float32, height::Float32, projection_matrix::Mat4{Float32})
+    error("interpret_view not implemented for component of type $(typeof(component))")
+end
+
+
 """
     render(component::AbstractGuiComponent)
 
@@ -65,7 +73,7 @@ function render(component::AbstractGuiComponent, projection_matrix::Mat4{Float32
 end
 
 
-function set_color(component::AbstractGuiComponent, color::AbstractVector{<:Real})
+function set_color(component::AbstractView, color::AbstractVector{<:Real})
     if 4 < length(color)
         error("Color vector must have 4 elements (RGBA).")
     elseif length(color) == 3
@@ -75,13 +83,13 @@ function set_color(component::AbstractGuiComponent, color::AbstractVector{<:Real
     component.style.background_color = Vec4(color...)
 end
 
-function set_color(component::AbstractGuiComponent, color::ColorTypes.RGBA{<:AbstractFloat})
+function set_color(component::AbstractView, color::ColorTypes.RGBA{<:AbstractFloat})
     # Convert RGBA to Vec4
     color_vec = Vec4(color.r, color.g, color.b, color.alpha)
     component.style.background_color = color_vec
 end
 
-function set_color(component::AbstractGuiComponent, color::ColorTypes.RGB{<:AbstractFloat})
+function set_color(component::AbstractView, color::ColorTypes.RGB{<:AbstractFloat})
     # Convert RGB to Vec4
     color_vec = Vec4(color.r, color.g, color.b, 1.0)
     component.style.background_color = color_vec

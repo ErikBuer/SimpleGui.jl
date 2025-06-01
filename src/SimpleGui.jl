@@ -16,6 +16,7 @@ include("hooks.jl")
 export use_state
 
 include("gui_component.jl")
+export AbstractView
 export AbstractGuiComponent, register_component
 export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up
 
@@ -98,19 +99,24 @@ function run(window_state::WindowState)
         ModernGL.glClear(ModernGL.GL_COLOR_BUFFER_BIT)
 
         # Update mouse position
-        window_state.mouse_state.x, window_state.mouse_state.y = GLFW.GetCursorPos(window_state.handle)
+        #window_state.mouse_state.x, window_state.mouse_state.y = GLFW.GetCursorPos(window_state.handle)
 
         # Centralized event handling
-        handle_events(window_state)
+        # handle_events(window_state)
 
-        render(window_state.main_container, window_state.projection_matrix::Mat4{Float32})
+        # render(window_state.main_container, window_state.projection_matrix::Mat4{Float32})
+
+        # Interpret and render the main container
+        #root_layout = apply_layout(window_state.root_view, 0.0, 0.0, window_state.width_px, window_state.height_px)
+        # interpret_view(root_layout, window_state.projection_matrix)
+        interpret_view(window_state.root_view, 0.0f0, 0.0f0, Float32(window_state.width_px), Float32(window_state.height_px), window_state.projection_matrix)
 
         # Swap buffers and poll events
         GLFW.SwapBuffers(window_state.handle)
         GLFW.PollEvents()
     end
 
-    # Clean up the window
+    # Clean up
     GLFW.DestroyWindow(window_state.handle)
 end
 

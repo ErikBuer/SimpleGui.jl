@@ -1,5 +1,4 @@
-include("SimpleGui.jl")
-using .SimpleGui
+using SimpleGui
 
 using ColorTypes
 
