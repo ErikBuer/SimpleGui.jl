@@ -1,17 +1,20 @@
 
 include("components/empty.jl")
 
+include("components/row.jl")
+export Row
+
+include("components/column.jl")
+export Column
+
 include("components/container.jl")
-export Container, ContainerView
+export Container
 
 #include("components/scroll_bar.jl")
 #export ScrollBar
 
 #include("components/scroll_area.jl")
 #export ScrollArea
-
-#include("components/linear_layout.jl")
-#export VerticalLayout, HorizontalLayout
 
 #include("components/docked_container.jl")
 #export DockedContainer

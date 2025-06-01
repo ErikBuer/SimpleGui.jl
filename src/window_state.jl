@@ -30,7 +30,7 @@ function handle_events(window_state::WindowState)
 end
 
 
-function framebuffer_size_callback(window_state::WindowState, gl_window, width_px::Int, height_px::Int)
+function framebuffer_size_callback(window_state::WindowState, gl_window, width_px::Integer, height_px::Integer)
     window_state.width_px = width_px
     window_state.height_px = height_px
 end
@@ -83,7 +83,7 @@ function initialize_window(root_view::AbstractView; title::String="SimpleGUI", w
 
     window_state = WindowState(window_width_px, window_height_px, gl_window, root_view, mouse_state, projection_matrix)
 
-    _framebuffer_size_callback(gl_window, width_px::Int, height_px::Int) = framebuffer_size_callback(window_state, gl_window, width_px, height_px)
+    _framebuffer_size_callback(gl_window, width_px::Integer, height_px::Integer) = framebuffer_size_callback(window_state, gl_window, width_px, height_px)
     _mouse_button_callback(gl_window, button, action, mods) = mouse_button_callback(window_state, gl_window, button, action, mods)
 
     # Register the framebuffer size callback with a closure

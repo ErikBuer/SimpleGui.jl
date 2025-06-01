@@ -2,27 +2,29 @@ mutable struct ContainerStyle
     background_color::Vec4{<:AbstractFloat} #RGBA color
     border_color::Vec4{<:AbstractFloat} #RGBA color
     border_width_px::Float32
+    padding_px::Float32
 end
 
 function ContainerStyle(;
     background_color=Vec4{Float32}(0.8f0, 0.8f0, 0.8f0, 1.0f0),
     border_color=Vec4{Float32}(0.0f0, 0.0f0, 0.0f0, 1.0f0),
-    border_width_px=1.0f0)
-    return ContainerStyle(background_color, border_color, border_width_px)
+    border_width_px=1.0f0,
+    padding_px::Float32=10f0 # Padding in pixels
+)
+    return ContainerStyle(background_color, border_color, border_width_px, padding_px)
 end
 
 struct ContainerView <: AbstractView
     child::AbstractView  # Single child view
     style::ContainerStyle
-    layout::AlignedLayout
 end
 
 """
 The `Container` is the most basic GUI component that can contain another component.
 It is the most basic building block of the GUI system.
 """
-function Container(; child::AbstractView=EmptyView(), style=ContainerStyle(), layout=AlignedLayout())
-    return ContainerView(child, style, layout)
+function Container(child::AbstractView=EmptyView(); style=ContainerStyle())
+    return ContainerView(child, style)
 end
 
 function handle_click(container::ContainerView, mouse_state::MouseState)
@@ -74,9 +76,10 @@ function handle_mouse_over(container::ContainerView, mouse_state::MouseState)
     end
 end
 
+
 function apply_layout(view::ContainerView, x::Float32, y::Float32, width::Float32, height::Float32)
     # Extract padding from the container's layout
-    padding = view.layout.padding_px
+    padding = view.style.padding_px
     padded_x = x + padding
     padded_y = y + padding
     padded_width = width - 2 * padding
@@ -86,22 +89,8 @@ function apply_layout(view::ContainerView, x::Float32, y::Float32, width::Float3
     child_width = padded_width
     child_height = padded_height
 
-    if view.layout.size_rule == Fixed
-        child_width = min(padded_width, width)
-        child_height = min(padded_height, height)
-    elseif view.layout.size_rule == FillParentHorizontal
-        child_width = padded_width
-    elseif view.layout.size_rule == FillParentVertical
-        child_height = padded_height
-    end
-
     child_x = padded_x
     child_y = padded_y
-
-    if view.layout.alignement == AlignCenter
-        child_x += (padded_width - child_width) / 2
-        child_y += (padded_height - child_height) / 2
-    end
 
     return (child_x, child_y, child_width, child_height)
 end
