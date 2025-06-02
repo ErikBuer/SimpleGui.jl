@@ -11,6 +11,7 @@ The state of a window, including its size and context.
     Its primary purpose is to be a reference for docking and layout calculations.
 - `mouse_state`: The current state of the mouse, including its position and button states.
 - `projection_matrix`: The projection matrix used for pixel coordinates to NDC conversion.
+- `interaction_state`: 
 """
 mutable struct WindowState
     width_px::Integer
@@ -19,14 +20,20 @@ mutable struct WindowState
     root_view::AbstractView  # Root of the UI tree
     mouse_state::MouseState
     projection_matrix::Mat4{Float32}
+    interaction_state::InteractionState  # Interaction state for this window
 end
 
+function generate_events(window_state::WindowState)::Vector{Event}
+
+    # TODO
+end
 
 function handle_events(window_state::WindowState)
-    for component in window_state.main_container.children
-        # Handle events for the component
-        handle_component_events(component, window_state.mouse_state)
-    end
+    # Generate events
+    #TODO events = generate_events(window_state)
+
+    # Process events
+    #TODO process_events(events)
 end
 
 
@@ -81,7 +88,10 @@ function initialize_window(root_view::AbstractView; title::String="SimpleGUI", w
         0.0f0, Float32(window_width_px), Float32(window_height_px), 0.0f0, -1.0f0, 1.0f0
     )
 
-    window_state = WindowState(window_width_px, window_height_px, gl_window, root_view, mouse_state, projection_matrix)
+    # Initialize the interaction state
+    interaction_state = InteractionState(nothing, nothing, nothing)
+
+    window_state = WindowState(window_width_px, window_height_px, gl_window, root_view, mouse_state, projection_matrix, interaction_state)
 
     _framebuffer_size_callback(gl_window, width_px::Integer, height_px::Integer) = framebuffer_size_callback(window_state, gl_window, width_px, height_px)
     _mouse_button_callback(gl_window, button, action, mods) = mouse_button_callback(window_state, gl_window, button, action, mods)

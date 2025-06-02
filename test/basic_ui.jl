@@ -6,7 +6,7 @@ function main()
 
     function MyApp()
         Row([
-            Container(),
+            Container(on_click=() -> println("Clicked on Container 1")),
             Container(),
             Column([Container(), Container(), Container(Container())], padding=0)
         ])
@@ -14,10 +14,8 @@ function main()
 
     ui = MyApp()
 
-    window_state = initialize_window(ui, title="Simple GUI Example")
-
     # Run the GUI
-    SimpleGui.run(window_state)
+    SimpleGui.run(ui, title="Simple GUI Example")
 end
 
 

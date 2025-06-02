@@ -354,6 +354,10 @@ function draw_text_sdf(
     GLA.unbind(sdf_prog[])
 end
 
+function inside_rect(x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat, mouse_x::AbstractFloat, mouse_y::AbstractFloat)::Bool
+    return mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height
+end
+
 """
     inside_rectangular_component(component::AbstractGuiComponent, mouse_state::MouseState)::Bool
 
