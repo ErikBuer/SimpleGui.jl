@@ -21,12 +21,15 @@ export use_state
 
 include("text/text_style.jl")
 export TextStyle
+include("text/draw.jl")
+
 
 include("abstract_view.jl")
 export AbstractView
 export AbstractGuiComponent, register_component
 
 include("gui_component/utilities.jl")
+include("gui_component/draw.jl")
 
 include("components.jl")
 
