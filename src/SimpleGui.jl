@@ -19,16 +19,18 @@ export mouse_state, mouse_button_callback, MouseState
 include("hooks.jl")
 export use_state
 
-include("gui_component.jl")
+include("text/text_style.jl")
+export TextStyle
+
+include("abstract_view.jl")
 export AbstractView
 export AbstractGuiComponent, register_component
-export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up
+
+include("gui_component/utilities.jl")
 
 include("components.jl")
 
-include("test_utilitites.jl") #TODO converto to new functional structure
-
-include("text_processing.jl")
+include("test_utilitites.jl")
 
 
 function detect_click(root_view::AbstractView, mouse_state::MouseState, x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat)
