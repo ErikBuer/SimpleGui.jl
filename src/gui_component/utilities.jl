@@ -196,7 +196,8 @@ function draw_text(
     x_px::Float32,
     y_px::Float32,
     pixelsize::Int,
-    projection_matrix::Mat4{Float32}
+    projection_matrix::Mat4{Float32},
+    color::Vec4{Float32}
 )
     current_x = x_px
 
@@ -225,7 +226,8 @@ function draw_text(
             current_x + Float32(extent.horizontal_bearing[1]),  # Adjust for horizontal bearing
             y_px - Float32(extent.horizontal_bearing[2]),       # Adjust for vertical bearing
             projection_matrix;
-            scale=1.0
+            scale=1.0,
+            color=color  # Pass the color to draw_glyph
         )
 
         # Advance the x position by the glyph's advance width
@@ -233,7 +235,7 @@ function draw_text(
     end
 end
 
-function draw_glyph(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::AbstractFloat, projection_matrix::Mat4{Float32}; scale::AbstractFloat=1.0)
+function draw_glyph(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::AbstractFloat, projection_matrix::Mat4{Float32}; scale::AbstractFloat=1.0, color::Vec4{Float32}=Vec{4,Float32}(1.0, 1.0, 1.0, 1.0))
     # Get the image size from the texture
     width_px, height_px = Float32.(GLA.size(texture))
 
@@ -265,7 +267,7 @@ function draw_glyph(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::A
     # Generate buffers and create a Vertex Array Object (VAO)
     vao = GLA.VertexArray(
         GLA.generate_buffers(
-            prog[],
+            glyph_prog[],
             position=positions,
             texcoord=texturecoordinates
         ),
@@ -273,15 +275,13 @@ function draw_glyph(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::A
     )
 
     # Bind the shader program
-    GLA.bind(prog[])
+    GLA.bind(glyph_prog[])
 
     # Set the `use_texture` uniform to true
-    GLA.gluniform(prog[], :use_texture, true)
-
-    # Bind the texture to the shader's sampler2D uniform
-    GLA.gluniform(prog[], :image, 0, texture)
-
-    GLA.gluniform(prog[], :projection, projection_matrix)
+    GLA.gluniform(glyph_prog[], :use_texture, true)
+    GLA.gluniform(glyph_prog[], :image, 0, texture)
+    GLA.gluniform(glyph_prog[], :projection, projection_matrix)
+    GLA.gluniform(glyph_prog[], :text_color, color)
 
     # Bind the VAO and draw the rectangle
     GLA.bind(vao)
@@ -289,108 +289,9 @@ function draw_glyph(texture::GLAbstraction.Texture, x_px::AbstractFloat, y_px::A
 
     # Unbind the VAO and shader program
     GLA.unbind(vao)
-    GLA.unbind(prog[])
-end
-
-function draw_text_sdf(
-    sdf_texture::GLAbstraction.Texture,
-    x_px::Float32,
-    y_px::Float32,
-    width_px::Float32,
-    height_px::Float32,
-    projection_matrix::Mat4{Float32},
-    text_color::Vec4{Float32}=Vec{4,Float32}(1.0, 1.0, 1.0, 1.0),
-    smoothing::Float32=0.05f0
-)
-    # Define rectangle vertices
-    positions = [
-        Point2f(x_px, y_px + height_px),            # Bottom-left
-        Point2f(x_px + width_px, y_px + height_px), # Bottom-right
-        Point2f(x_px + width_px, y_px),             # Top-right
-        Point2f(x_px, y_px),                        # Top-left
-    ]
-
-    # Define texture coordinates
-    texcoords = [
-        Vec{2,Float32}(0.0, 1.0),  # Bottom-left
-        Vec{2,Float32}(1.0, 1.0),  # Bottom-right
-        Vec{2,Float32}(1.0, 0.0),  # Top-right
-        Vec{2,Float32}(0.0, 0.0),  # Top-left
-    ]
-
-    # Define the elements (two triangles forming the rectangle)
-    indices = NgonFace{3,UInt32}[
-        (0, 1, 2),  # First triangle
-        (2, 3, 0)   # Second triangle
-    ]
-
-    # Generate buffers and create a Vertex Array Object (VAO)
-    vao = GLA.VertexArray(
-        GLA.generate_buffers(
-            sdf_prog[],
-            position=positions,
-            texcoord=texcoords
-        ),
-        indices
-    )
-
-    # Bind the SDF shader program
-    GLA.bind(sdf_prog[])
-
-    # Set uniforms
-    GLA.gluniform(sdf_prog[], :projection, projection_matrix)
-    GLA.gluniform(sdf_prog[], :text_color, text_color)
-    GLA.gluniform(sdf_prog[], :smoothing, smoothing)
-
-    # Bind the SDF texture
-    GLA.gluniform(sdf_prog[], :sdfTexture, 0, sdf_texture)
-
-    # Bind the VAO and draw the rectangle
-    GLA.bind(vao)
-    GLA.draw(vao)
-
-    # Unbind the VAO and shader program
-    GLA.unbind(vao)
-    GLA.unbind(sdf_prog[])
-end
-
-function inside_rect(x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat, mouse_x::AbstractFloat, mouse_y::AbstractFloat)::Bool
-    return mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height
+    GLA.unbind(glyph_prog[])
 end
 
 function inside_component(view::AbstractView, x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat, mouse_x::AbstractFloat, mouse_y::AbstractFloat)::Bool
     return mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height
-end
-
-
-"""
-    dc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
-
-Convert NDC scale to pixels.
-
-```jldoctest
-julia> using SimpleGui
-
-julia> SimpleGui.ndc_to_px(0.5, 800)
-200.0
-```
-"""
-function ndc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat
-    return (dim / 2) * dim_px
-end
-
-"""
-    px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
-
-Convert pixel to NDC scale.
-
-```jldoctest
-julia> using SimpleGui
-
-julia> SimpleGui.px_to_ndc(200.0, 800)
-0.5
-```
-"""
-function px_to_ndc(px::AbstractFloat, dim_px::Integer)::AbstractFloat
-    return (px / dim_px) * 2
 end

@@ -26,6 +26,6 @@ function interpret_view(view::TextView, x::Float32, y::Float32, width::Float32, 
         y,                   # Y position
         size_px,             # Text size
         projection_matrix,   # Projection matrix
-        #color                # Text color
+        color                # Text color
     )
 end
