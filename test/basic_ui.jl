@@ -16,6 +16,7 @@ function main()
 
     # Run the GUI
     SimpleGui.run(ui, title="SimpleGUI Example")
+    #SimpleGui.save_screenshot_offscreen(ui, "ui_screenshot.png", 400, 300)
 end
 
 
