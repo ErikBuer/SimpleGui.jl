@@ -1,21 +1,22 @@
 # Docked Container
 
+`DockedContainer` is a component for creating top bars and sidebars, Navbar, and the like.
+
 ``` @example DockedCointainer
 using SimpleGui
 
-# Initialize the window
-window = initialize_window("Simple GUI Example", (400, 300))
+function MyApp()
+    Row([
+        Container(on_click=() -> println("Clicked on Container 1")),
+        Container(),
+        Column([Container(), Container(), Container(Container())], padding=0)
+    ])
+end
 
-top_bar = DockedContainer()
-top_bar.layout.docking = DockTop
-register_component(top_bar)
+ui = MyApp()
 
-
-side_bar = DockedContainer()
-side_bar.layout.docking = DockLeft
-register_component(side_bar)
-
-SimpleGui.save_screenshot_offscreen("docked_container.png", 400, 300) # hide
+# Save a screenshot of the UI
+SimpleGui.save_screenshot_offscreen(ui, "ui_screenshot.png", 400, 300)
 ```
 
-![Docked Container example](docked_container.png)
+![UI example](ui_screenshot.png)

@@ -2,93 +2,110 @@ module SimpleGui
 
 using ModernGL, GLAbstraction, GLFW # OpenGL dependencies
 const GLA = GLAbstraction
+using FreeTypeAbstraction # Font rendering dependencies
 
 using GeometryBasics, ColorTypes    # Additional rendering dependencies
 
-include("shader.jl")
+include("matrices.jl")
+
+include("shaders.jl")
 export initialize_shaders, prog
 
 include("mouse.jl")
-export mouse_state, mouse_button_callback, ButtonState, IsPressed, IsReleased, MouseState
-
-include("window_info.jl")
-export initialize_window
+export MouseButton, ButtonState, IsReleased, IsPressed, MouseState, mouse_button_callback
+export ButtonState, IsPressed, IsReleased
+export mouse_state, mouse_button_callback, MouseState
 
 include("hooks.jl")
 export use_state
 
 include("gui_component.jl")
+export AbstractView
 export AbstractGuiComponent, register_component
 export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up
 
-include("events.jl")
-export register_event
-export OnClick, OnContextMenu, OnDblClick, OnMouseDown, OnMouseEnter, OnMouseLeave, OnMouseMove, OnMouseOut, OnMouseOver, OnMouseUp
-
-include("gui_component/component_state.jl")
-export ComponentState, get_state
-
 include("components.jl")
 
-include("test_utilitites.jl")
+include("test_utilitites.jl") #TODO converto to new functional structure
 
-"""
-Primary container for the GUI application.
+include("text_processing.jl")
 
-This is the main container that holds all other components.
 
-Its primary purpose is to be a reference for docking and layout calculations.
-"""
-global main_container = _Container(-1.0, -1.0, 2.0, 2.0)
-main_container.layout.padding_px = 0.0
-set_color(main_container, ColorTypes.RGBA(0.0, 0.0, 0.0, 0.0))
+function detect_click(root_view::AbstractView, mouse_state::MouseState, x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat)
+    # Traverse the UI hierarchy
+    if root_view isa ContainerView
+        (child_x, child_y, child_width, child_height) = apply_layout(root_view, x, y, width, height)
 
-"""
-    register_component(component::AbstractGuiComponent)
+        # Check if the mouse is inside the component
+        if inside_component(root_view, child_x, child_y, child_width, child_height, mouse_state.x, mouse_state.y)
+            if mouse_state.button_state[LeftButton] == IsPressed
+                root_view.on_click()  # Call the on_click function
+            end
+        end
 
-Register a GUI component to the global list of components.
-This function is used to keep track of all components (on the top level) that need to be rendered and updated.
-"""
-function register_component(component::AbstractGuiComponent)
-    push!(main_container.children, component)
+        # Recursively check the child
+        detect_click(root_view.child, mouse_state, child_x, child_y, child_width, child_height)
+    end
 end
 
 
-# Create a global instance of the window info
-global window_info = WindowInfo(800, 600, nothing)
-
-global mouse_state
-mouse_state = MouseState(Dict(GLFW.MOUSE_BUTTON_LEFT => IsReleased, GLFW.MOUSE_BUTTON_RIGHT => IsReleased), 0.0, 0.0)
-
-
 """
-    run(window)
+    run(root_view::AbstractView; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
 
 Run the main loop for the GUI application.
 This function handles the rendering and event processing for the GUI.
 """
-function run(window)
-    while !GLFW.WindowShouldClose(window)
+function run(root_view::AbstractView; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
+    # Initialize the GLFW window
+    gl_window = GLFW.Window(name=title, resolution=(window_width_px, window_height_px))
+    GLA.set_context!(gl_window)
+    GLFW.MakeContextCurrent(gl_window)
+
+    # Enable alpha blending
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+    initialize_shaders()
+
+    # Initialize local states
+    mouse_state = MouseState(
+        Dict(LeftButton => IsReleased, RightButton => IsReleased, MiddleButton => IsReleased),
+        0.0,
+        0.0,
+        0.0,
+        (0.0, 0.0)
+    )
+    GLFW.SetMouseButtonCallback(gl_window, (gl_window, button, action, mods) -> mouse_button_callback(gl_window, button, action, mods, mouse_state))
+    projection_matrix = get_orthographic_matrix(0.0f0, Float32(window_width_px), Float32(window_height_px), 0.0f0, -1.0f0, 1.0f0)
+
+    # Main loop
+    while !GLFW.WindowShouldClose(gl_window)
+        # Update window size
+        width_px, height_px = GLFW.GetFramebufferSize(gl_window)
+
+        # Update viewport and projection matrix
+        glViewport(0, 0, width_px, height_px)
+        projection_matrix = get_orthographic_matrix(0.0f0, Float32(width_px), Float32(height_px), 0.0f0, -1.0f0, 1.0f0)
+
         # Clear the screen
         ModernGL.glClear(ModernGL.GL_COLOR_BUFFER_BIT)
 
-        # Update mouse position
-        mouse_x, mouse_y = GLFW.GetCursorPos(window)
-        mouse_state.x = (mouse_x / window_info.width_px) * 2 - 1
-        mouse_state.y = -((mouse_y / window_info.height_px) * 2 - 1)
+        # Poll mouse position
+        mouse_state.x, mouse_state.y = Tuple(GLFW.GetCursorPos(gl_window))
 
-        # Centralized event handling
-        handle_events(mouse_state)
+        # Detect clicks
+        detect_click(root_view, mouse_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
 
-        render(main_container)
+        # Render the UI
+        interpret_view(root_view, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px), projection_matrix)
 
         # Swap buffers and poll events
-        GLFW.SwapBuffers(window)
+        GLFW.SwapBuffers(gl_window)
         GLFW.PollEvents()
     end
 
-    # Clean up the window
-    GLFW.DestroyWindow(window)
+    # Clean up
+    GLFW.DestroyWindow(gl_window)
 end
 
 end

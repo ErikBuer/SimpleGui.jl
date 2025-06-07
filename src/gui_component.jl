@@ -1,3 +1,5 @@
+abstract type AbstractView end
+
 abstract type AbstractGuiComponent end
 """
 DockedContainer are docked to a specific side (e.g., left, right, top, bottom) and typically have fixed sizes in one dimension (e.g., width for vertical docking).
@@ -9,13 +11,6 @@ Aligned components (e.g., AlignCenter) are positioned relative to the parent, li
 abstract type AbstractAlignedComponent <: AbstractGuiComponent end
 
 include("gui_component/utilities.jl")
-
-include("gui_component/layout.jl")
-export AlignedLayout, DockedLayout
-export Alignement, AlignCenter
-export SizeRule, FillParentHorizontal, FillParentVertical, FillParentArea, SizeToContent, Fixed
-export Docking, DockTop, DockBottom, DockLeft, DockRight
-export set_color
 
 # Placeholder functions for components
 function handle_click(component::AbstractGuiComponent, mouse_state::MouseState)
@@ -49,40 +44,24 @@ function handle_mouse_up(component::AbstractGuiComponent, mouse_state::MouseStat
     error("handle_mouse_up is not implemented for $(typeof(component))")
 end
 
+
 """
-    render(component::AbstractGuiComponent)
+    interpret_view(component::AbstractView, x::Float32, y::Float32, width::Float32, height::Float32, projection_matrix::Mat4{Float32})
 
-Renders the given component and its children based on the positions and sizes calculated by `apply_layout`.
-
-Responsibilities:
-- Draw the component itself (e.g., background, borders, etc.).
-- Recursively render the component's children.
-
-This function assumes that `apply_layout` has already been called to calculate the positions and sizes.
+Interpret the view of a GUI component.
+This function is responsible for interpreting the view of a GUI component based on its layout and properties.
 """
-function render(component::AbstractGuiComponent)
-    error("render is not implemented for $(typeof(component))")
+function interpret_view(component::AbstractView, x::Float32, y::Float32, width::Float32, height::Float32, projection_matrix::Mat4{Float32})
+    error("interpret_view not implemented for component of type $(typeof(component))")
 end
 
+"""
+    apply_layout(component::AbstractView)
 
-function set_color(component::AbstractGuiComponent, color::AbstractVector{<:Real})
-    if 4 < length(color)
-        error("Color vector must have 4 elements (RGBA).")
-    elseif length(color) == 3
-        # If only RGB is provided, set alpha to 1.0
-        color = [color; 1.0]
-    end
-    component.style.background_color = Vec4(color...)
-end
-
-function set_color(component::AbstractGuiComponent, color::ColorTypes.RGBA{<:AbstractFloat})
-    # Convert RGBA to Vec4
-    color_vec = Vec4(color.r, color.g, color.b, color.alpha)
-    component.style.background_color = color_vec
-end
-
-function set_color(component::AbstractGuiComponent, color::ColorTypes.RGB{<:AbstractFloat})
-    # Convert RGB to Vec4
-    color_vec = Vec4(color.r, color.g, color.b, 1.0)
-    component.style.background_color = color_vec
+Apply layout to a GUI component and its children.
+This function calculates and applies the layout to components.
+The `interpret_view` function then uses the positions and sizes calculated by this function.
+"""
+function apply_layout(component::AbstractView)
+    error("apply_layout is not implemented for $(typeof(component))")
 end

@@ -1,12 +1,10 @@
 using FileIO, ImageCore
 
 function create_offscreen_framebuffer(width::Int, height::Int)
-    # Generate a framebuffer
     framebuffer = Ref{UInt32}(0)
     ModernGL.glGenFramebuffers(1, framebuffer)
     ModernGL.glBindFramebuffer(ModernGL.GL_FRAMEBUFFER, framebuffer[])
 
-    # Create a texture to render to
     texture = Ref{UInt32}(0)
     ModernGL.glGenTextures(1, texture)
     ModernGL.glBindTexture(ModernGL.GL_TEXTURE_2D, texture[])
@@ -14,10 +12,8 @@ function create_offscreen_framebuffer(width::Int, height::Int)
     ModernGL.glTexParameteri(ModernGL.GL_TEXTURE_2D, ModernGL.GL_TEXTURE_MIN_FILTER, ModernGL.GL_LINEAR)
     ModernGL.glTexParameteri(ModernGL.GL_TEXTURE_2D, ModernGL.GL_TEXTURE_MAG_FILTER, ModernGL.GL_LINEAR)
 
-    # Attach the texture to the framebuffer
     ModernGL.glFramebufferTexture2D(ModernGL.GL_FRAMEBUFFER, ModernGL.GL_COLOR_ATTACHMENT0, ModernGL.GL_TEXTURE_2D, texture[], 0)
 
-    # Check if the framebuffer is complete
     if ModernGL.glCheckFramebufferStatus(ModernGL.GL_FRAMEBUFFER) != ModernGL.GL_FRAMEBUFFER_COMPLETE
         error("Framebuffer is not complete!")
     end
@@ -25,34 +21,38 @@ function create_offscreen_framebuffer(width::Int, height::Int)
     return framebuffer[], texture[]
 end
 
-function save_screenshot_offscreen(output_file::String, width::Int, height::Int)
-    # Create an offscreen framebuffer
+function save_screenshot_offscreen(root_view::AbstractView, output_file::String, width::Int, height::Int)
+    println("Initializing OpenGL context...")
+
+    # Initialize GLFW window (offscreen context)
+    gl_window = GLFW.Window(name="Offscreen", resolution=(width, height))
+    GLA.set_context!(gl_window)
+    GLFW.MakeContextCurrent(gl_window)
+
+
+    ModernGL.glEnable(ModernGL.GL_BLEND)
+    ModernGL.glBlendFunc(ModernGL.GL_SRC_ALPHA, ModernGL.GL_ONE_MINUS_SRC_ALPHA)
+
+    initialize_shaders()
+
     framebuffer, texture = create_offscreen_framebuffer(width, height)
-
-    # Bind the framebuffer
     ModernGL.glBindFramebuffer(ModernGL.GL_FRAMEBUFFER, framebuffer)
-
-    # Set the viewport to match the framebuffer size
     ModernGL.glViewport(0, 0, width, height)
-
-    # Clear the framebuffer
     ModernGL.glClear(ModernGL.GL_COLOR_BUFFER_BIT)
 
-    # Render the scene
-    render(main_container)
+    projection_matrix = get_orthographic_matrix(0.0f0, Float32(width), Float32(height), 0.0f0, -1.0f0, 1.0f0)
 
-    # Read the pixels from the framebuffer
+    interpret_view(root_view, 0.0f0, 0.0f0, Float32(width), Float32(height), projection_matrix)
+
     buffer = Array{UInt8}(undef, 3, width, height)  # RGB format
     ModernGL.glReadPixels(0, 0, width, height, ModernGL.GL_RGB, ModernGL.GL_UNSIGNED_BYTE, buffer)
 
-    # Flip the image vertically (OpenGL's origin is bottom-left)
     flipped_buffer = reverse(buffer, dims=3)
 
-    # Save the image as a PNG
     img = permutedims(flipped_buffer, (3, 2, 1))  # Convert to (width, height, channels)
     save(output_file, img)
 
-    # Clean up
     ModernGL.glDeleteFramebuffers(1, Ref(framebuffer))
     ModernGL.glDeleteTextures(1, Ref(texture))
+    GLFW.DestroyWindow(gl_window)
 end
