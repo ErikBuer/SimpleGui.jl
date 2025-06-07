@@ -358,18 +358,10 @@ function inside_rect(x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, h
     return mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height
 end
 
-"""
-    inside_rectangular_component(component::AbstractGuiComponent, mouse_state::MouseState)::Bool
-
-Check if the mouse is inside a rectangular component.
-"""
-function inside_rectangular_component(component::AbstractGuiComponent, mouse_state::MouseState)::Bool
-    # Check if the mouse is inside the component's rectangular area
-    x, y = mouse_state.x, mouse_state.y
-
-    return (x >= component.x && x <= component.x + component.width &&
-            y >= component.y && y <= component.y + component.height)
+function inside_component(view::AbstractView, x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat, mouse_x::AbstractFloat, mouse_y::AbstractFloat)::Bool
+    return mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height
 end
+
 
 """
     dc_to_px(dim::AbstractFloat, dim_px::Integer)::AbstractFloat

@@ -8,14 +8,14 @@ function main()
         Row([
             Container(on_click=() -> println("Clicked on Container 1")),
             Container(),
-            Column([Container(), Container(), Container(Container())], padding=0)
+            Column([Container(), Container(), Container(Container(on_click=() -> println("Clicked")))], padding=0)
         ])
     end
 
     ui = MyApp()
 
     # Run the GUI
-    SimpleGui.run(ui, title="Simple GUI Example")
+    SimpleGui.run(ui, title="SimpleGUI Example")
 end
 
 

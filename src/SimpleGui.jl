@@ -10,13 +10,12 @@ include("shaders.jl")
 export initialize_shaders, prog
 
 include("mouse.jl")
-export mouse_state, mouse_button_callback, ButtonState, IsPressed, IsReleased, MouseState
+export MouseButton, ButtonState, IsReleased, IsPressed, MouseState, mouse_button_callback
+export ButtonState, IsPressed, IsReleased
+export mouse_state, mouse_button_callback, MouseState
 
 include("hooks.jl")
 export use_state
-
-include("events.jl")
-export OnClick, OnContextMenu, OnDblClick, OnMouseDown, OnMouseEnter, OnMouseLeave, OnMouseMove, OnMouseOut, OnMouseOver, OnMouseUp
 
 include("gui_component.jl")
 export AbstractView
@@ -24,8 +23,6 @@ export AbstractGuiComponent, register_component
 export handle_click, handle_context_menu, handle_dbl_click, handle_mouse_enter, handle_mouse_leave, handle_mouse_move, handle_mouse_out, handle_mouse_over, handle_mouse_down, handle_mouse_up
 
 include("components.jl")
-
-include("interaction_state.jl")
 
 # include("test_utilitites.jl") #TODO converto to new functional structure
 
@@ -57,9 +54,26 @@ function get_identity_matrix()
     ))
 end
 
+function detect_click(root_view::AbstractView, mouse_state::MouseState, x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat)
+    # Traverse the UI hierarchy
+    if root_view isa ContainerView
+        (child_x, child_y, child_width, child_height) = apply_layout(root_view, x, y, width, height)
+
+        # Check if the mouse is inside the component
+        if inside_component(root_view, child_x, child_y, child_width, child_height, mouse_state.x, mouse_state.y)
+            if mouse_state.button_state[LeftButton] == IsPressed
+                root_view.on_click()  # Call the on_click function
+            end
+        end
+
+        # Recursively check the child
+        detect_click(root_view.child, mouse_state, child_x, child_y, child_width, child_height)
+    end
+end
+
 
 """
-    run(window)
+    run(root_view::AbstractView; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
 
 Run the main loop for the GUI application.
 This function handles the rendering and event processing for the GUI.
@@ -78,11 +92,13 @@ function run(root_view::AbstractView; title::String="SimpleGUI", window_width_px
 
     # Initialize local states
     mouse_state = MouseState(
-        Dict(GLFW.MOUSE_BUTTON_LEFT => IsReleased, GLFW.MOUSE_BUTTON_RIGHT => IsReleased),
+        Dict(LeftButton => IsReleased, RightButton => IsReleased, MiddleButton => IsReleased),
         0.0,
-        0.0
+        0.0,
+        0.0,
+        (0.0, 0.0)
     )
-    #interaction_state = InteractionState(nothing, nothing, nothing)
+    GLFW.SetMouseButtonCallback(gl_window, (gl_window, button, action, mods) -> mouse_button_callback(gl_window, button, action, mods, mouse_state))
     projection_matrix = get_orthographic_matrix(0.0f0, Float32(window_width_px), Float32(window_height_px), 0.0f0, -1.0f0, 1.0f0)
 
     # Main loop
@@ -97,14 +113,11 @@ function run(root_view::AbstractView; title::String="SimpleGUI", window_width_px
         # Clear the screen
         ModernGL.glClear(ModernGL.GL_COLOR_BUFFER_BIT)
 
-        # Update mouse position
-        mouse_x, mouse_y = GLFW.GetCursorPos(gl_window)
-        mouse_state = MouseState(mouse_state.button_state, mouse_x, mouse_y)
+        # Poll mouse position
+        mouse_state.x, mouse_state.y = Tuple(GLFW.GetCursorPos(gl_window))
 
-        # Generate and process events
-        #interaction_state = update_interaction_state(root_view, mouse_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
-        #events = generate_events(interaction_state)
-        #process_events(events, root_view)
+        # Detect clicks
+        detect_click(root_view, mouse_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
 
         # Render the UI
         interpret_view(root_view, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px), projection_matrix)

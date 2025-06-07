@@ -2,10 +2,11 @@ struct RowView <: AbstractView
     children::Vector{AbstractView}
     padding::Float32 # Padding around the row
     spacing::Float32 # Space between children
+    on_click::Function
 end
 
-function Row(children::Vector{<:AbstractView}; padding=10.0, spacing=10.0)
-    return RowView(children, padding, spacing)
+function Row(children::Vector{<:AbstractView}; padding=10.0, spacing=10.0, on_click::Function=() -> nothing)
+    return RowView(children, padding, spacing, on_click)
 end
 
 function apply_layout(view::RowView, x::Float32, y::Float32, width::Float32, height::Float32)
@@ -42,5 +43,22 @@ function interpret_view(view::RowView, x::Float32, y::Float32, width::Float32, h
     # Render each child using the calculated layout
     for (child, (child_x, child_y, child_width, child_height)) in zip(view.children, child_layouts)
         interpret_view(child, child_x, child_y, child_width, child_height, projection_matrix)
+    end
+end
+
+function detect_click(view::RowView, mouse_state::MouseState, x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat)
+    # Get the layout for the immediate children
+    child_layouts = apply_layout(view, x, y, width, height)
+
+    # Traverse each child and check for clicks
+    for (child, (child_x, child_y, child_width, child_height)) in zip(view.children, child_layouts)
+        if inside_component(child, child_x, child_y, child_width, child_height, mouse_state.x, mouse_state.y)
+            if mouse_state.button_state[LeftButton] == IsPressed
+                child.on_click()  # Call the on_click function of the clicked child
+            end
+        end
+
+        # Recursively check the child
+        detect_click(child, mouse_state, child_x, child_y, child_width, child_height)
     end
 end
