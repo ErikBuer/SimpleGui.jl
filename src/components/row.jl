@@ -47,17 +47,17 @@ function interpret_view(view::RowView, x::Float32, y::Float32, width::Float32, h
 end
 
 function detect_click(view::RowView, mouse_state::MouseState, x::AbstractFloat, y::AbstractFloat, width::AbstractFloat, height::AbstractFloat)
+    if inside_component(view, x, y, width, height, mouse_state.x, mouse_state.y)
+        if mouse_state.was_clicked[LeftButton]
+            view.on_click()  # Call the on_click function of the clicked child
+        end
+    end
+
     # Get the layout for the immediate children
     child_layouts = apply_layout(view, x, y, width, height)
 
     # Traverse each child and check for clicks
     for (child, (child_x, child_y, child_width, child_height)) in zip(view.children, child_layouts)
-        if inside_component(child, child_x, child_y, child_width, child_height, mouse_state.x, mouse_state.y)
-            if mouse_state.button_state[LeftButton] == IsPressed
-                child.on_click()  # Call the on_click function of the clicked child
-            end
-        end
-
         # Recursively check the child
         detect_click(child, mouse_state, child_x, child_y, child_width, child_height)
     end
