@@ -1,5 +1,3 @@
-# Utilities for GUI components
-
 using OffsetArrays, IndirectArrays
 
 

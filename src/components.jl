@@ -12,3 +12,6 @@ export Container
 
 include("components/text.jl")
 export Text
+
+include("components/image.jl")
+export Image

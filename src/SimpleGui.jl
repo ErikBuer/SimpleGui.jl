@@ -16,15 +16,17 @@ export MouseButton, ButtonState, IsReleased, IsPressed, MouseState, mouse_button
 export ButtonState, IsPressed, IsReleased
 export mouse_state, mouse_button_callback, MouseState
 
+include("abstract_view.jl")
+export AbstractView
+export AbstractGuiComponent
+
 include("text/utilities.jl")
 include("text/text_style.jl")
 export TextStyle
 include("text/draw.jl")
 
-
-include("abstract_view.jl")
-export AbstractView
-export AbstractGuiComponent, register_component
+include("image/utilities.jl")
+include("image/draw.jl")
 
 include("gui_component/utilities.jl")
 include("gui_component/draw.jl")
@@ -69,6 +71,9 @@ function run(root_view::AbstractView; title::String="SimpleGUI", window_width_px
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     initialize_shaders()
+
+    # Load textures for all ImageView components
+    load_textures(root_view)
 
     # Initialize local states
     mouse_state = MouseState(

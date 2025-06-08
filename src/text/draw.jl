@@ -1,15 +1,3 @@
-function create_text_texture(sdf_matrix::Matrix{Float32})::GLAbstraction.Texture
-    # Create a GLAbstraction.Texture
-    texture = GLA.Texture(sdf_matrix;
-        minfilter=:linear,
-        magfilter=:linear,
-        x_repeat=:clamp_to_edge,
-        y_repeat=:clamp_to_edge
-    )
-
-    return texture
-end
-
 function draw_text(
     font_face::FreeTypeAbstraction.FTFont,
     text::String,

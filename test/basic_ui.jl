@@ -6,7 +6,7 @@ function main()
     function MyApp()
         Row([
             Container(Text("Hello World"), on_click=() -> println("Clicked on Container 1")),
-            Container(),
+            Container(Image("test/images/logo.png")),
             Column([Container(), Container(), Container(Container(on_click=() -> println("Clicked")))], padding=0)
         ])
     end
