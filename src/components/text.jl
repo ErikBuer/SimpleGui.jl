@@ -1,10 +1,12 @@
 struct TextView <: AbstractView
     text::String
     style::TextStyle
+    horizontal_align::Symbol  # :left, :center, :right
+    vertical_align::Symbol    # :top, :middle, :bottom
 end
 
-function Text(text::String; style=TextStyle())
-    return TextView(text, style)
+function Text(text::String; style=TextStyle(), horizontal_align=:center, vertical_align=:middle)
+    return TextView(text, style, horizontal_align, vertical_align)
 end
 
 function apply_layout(view::TextView, x::Float32, y::Float32, width::Float32, height::Float32)
@@ -18,14 +20,59 @@ function interpret_view(view::TextView, x::Float32, y::Float32, width::Float32, 
     size_px = view.style.size_px
     color = view.style.color
 
-    # Render the text using draw_text with positional arguments
-    draw_text(
-        font,                # Font face
-        view.text,           # Text string
-        x,                   # X position
-        y,                   # Y position
-        size_px,             # Text size
-        projection_matrix,   # Projection matrix
-        color                # Text color
-    )
+    # Split text into words
+    words = split(view.text, " ")
+
+    # Calculate line breaks
+    lines = []
+    current_line = ""
+    current_width = 0.0f0
+
+    for word in words
+        # Measure the width of the word
+        word_width = measure_word_width(font, word, size_px)
+
+        # Check if the word fits in the current line
+        if current_width + word_width > width
+            # Move to a new line
+            push!(lines, current_line)
+            current_line = word
+            current_width = word_width
+        else
+            # Add the word to the current line
+            current_line *= " " * word
+            current_width += word_width
+        end
+    end
+
+    # Push the last line
+    push!(lines, current_line)
+
+    # Calculate total text height
+    total_height = length(lines) * size_px
+
+    # Calculate vertical alignment offset
+    vertical_offset = calculate_vertical_offset(height, total_height, view.vertical_align)
+
+    # Render each line
+    current_y = y + vertical_offset
+    for line in lines
+        # Calculate horizontal alignment offset
+        line_width = measure_word_width(font, line, size_px)
+        horizontal_offset = calculate_horizontal_offset(width, line_width, view.horizontal_align)
+
+        # Render the line
+        draw_text(
+            font,                # Font face
+            line,                # Text string
+            x + horizontal_offset, # X position
+            current_y,           # Y position
+            size_px,             # Text size
+            projection_matrix,   # Projection matrix
+            color                # Text color
+        )
+
+        # Move to the next line
+        current_y += size_px
+    end
 end

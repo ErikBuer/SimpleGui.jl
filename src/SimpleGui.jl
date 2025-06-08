@@ -16,9 +16,7 @@ export MouseButton, ButtonState, IsReleased, IsPressed, MouseState, mouse_button
 export ButtonState, IsPressed, IsReleased
 export mouse_state, mouse_button_callback, MouseState
 
-include("hooks.jl")
-export use_state
-
+include("text/utilities.jl")
 include("text/text_style.jl")
 export TextStyle
 include("text/draw.jl")
