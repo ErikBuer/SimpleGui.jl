@@ -1,30 +1,78 @@
-mutable struct TextStyle
-    font_size_px::Float32
-    font_color::Vec4{<:AbstractFloat}
-    font_family::String
-    font_weight::String
-    font_style::String
-    text_align::String
-    layout::AlignedLayout
-end
-
-function TextStyle(; font_size_px=12.0, font_color=(0.0, 0.0, 0.0, 1.0), font_family="Arial", font_weight="normal", font_style="normal", text_align="left")
-    return TextStyle(font_size_px, font_color, font_family, font_weight, font_style, text_align, AlignedLayout())
-end
-
-mutable struct Text <: AbstractGuiComponent
+struct TextView <: AbstractView
     text::String
-    x::Float32              # X position in pixels. Calculated value, not user input
-    y::Float32              # Y position in pixels. Calculated value, not user input
-    width::Float32          # Width in pixels. Calculated value, not user input
-    height::Float32         # Height in pixels. Calculated value, not user input
     style::TextStyle
+    horizontal_align::Symbol  # :left, :center, :right
+    vertical_align::Symbol    # :top, :middle, :bottom
 end
 
-function Text(x::Float32, y::Float32, text::String, style::TextStyle)
-    return Text(text, x, y, 0.5, 0.5, style)
+function Text(text::String; style=TextStyle(), horizontal_align=:center, vertical_align=:middle)
+    return TextView(text, style, horizontal_align, vertical_align)
 end
 
-function Text(text::String)
-    return Text(text, 0.0, 0.0, 0.0, 0.0, TextStyle())
+function apply_layout(view::TextView, x::Float32, y::Float32, width::Float32, height::Float32)
+    # Text layout is simple: it occupies the entire area provided
+    return (x, y, width, height)
+end
+
+function interpret_view(view::TextView, x::Float32, y::Float32, width::Float32, height::Float32, projection_matrix::Mat4{Float32})
+    # Extract style properties
+    font = view.style.font
+    size_px = view.style.size_px
+    color = view.style.color
+
+    # Split text into words
+    words = split(view.text, " ")
+
+    # Calculate line breaks
+    lines = []
+    current_line = ""
+    current_width = 0.0f0
+
+    for word in words
+        # Measure the width of the word
+        word_width = measure_word_width(font, word, size_px)
+
+        # Check if the word fits in the current line
+        if current_width + word_width > width
+            # Move to a new line
+            push!(lines, current_line)
+            current_line = word
+            current_width = word_width
+        else
+            # Add the word to the current line
+            current_line *= " " * word
+            current_width += word_width
+        end
+    end
+
+    # Push the last line
+    push!(lines, current_line)
+
+    # Calculate total text height
+    total_height = length(lines) * size_px
+
+    # Calculate vertical alignment offset
+    vertical_offset = calculate_vertical_offset(height, total_height, view.vertical_align)
+
+    # Render each line
+    current_y = y + vertical_offset
+    for line in lines
+        # Calculate horizontal alignment offset
+        line_width = measure_word_width(font, line, size_px)
+        horizontal_offset = calculate_horizontal_offset(width, line_width, view.horizontal_align)
+
+        # Render the line
+        draw_text(
+            font,                # Font face
+            line,                # Text string
+            x + horizontal_offset, # X position
+            current_y,           # Y position
+            size_px,             # Text size
+            projection_matrix,   # Projection matrix
+            color                # Text color
+        )
+
+        # Move to the next line
+        current_y += size_px
+    end
 end

@@ -1,13 +1,12 @@
 using SimpleGui
-using ColorTypes
+using SimpleGui: Text
 
 function main()
-    # Define the UI structure
 
     function MyApp()
         Row([
-            Container(on_click=() -> println("Clicked on Container 1")),
-            Container(),
+            Container(Text("Hello World"), on_click=() -> println("Clicked on Container 1")),
+            Container(Image("test/images/logo.png")),
             Column([Container(), Container(), Container(Container(on_click=() -> println("Clicked")))], padding=0)
         ])
     end
