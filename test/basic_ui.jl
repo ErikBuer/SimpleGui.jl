@@ -2,21 +2,34 @@ using SimpleGui
 using SimpleGui: Text
 
 function main()
+    # Mutable state variable
+    showImage = Ref(true)
+
+    ui = Ref{AbstractView}(Empty())
 
     function MyApp()
         Row([
-            Container(Text("Hello World"), on_click=() -> println("Clicked on Container 1")),
-            Container(Image("test/images/logo.png")),
+            Container(Text("Hello World")),
+            Container(
+                if showImage[]
+                    Image("test/images/logo.png")
+                else
+                    Text("Click to show image")
+                end,
+                on_click=() -> (
+                    println("Toggling image visibility...");
+                    showImage[] = !showImage[];  # Update state
+                    ui[] = MyApp()               # Update the UI reference
+                )
+            ),
             Column([Container(), Container(), Container(Container(on_click=() -> println("Clicked")))], padding=0)
         ])
     end
 
-    ui = MyApp()
+    ui[] = MyApp()
 
     # Run the GUI
-    SimpleGui.run(ui, title="SimpleGUI Example")
-    #SimpleGui.save_screenshot_offscreen(ui, "ui_screenshot.png", 400, 300)
+    SimpleGui.run(ui, title="Dynamic UI Example")
 end
-
 
 main()

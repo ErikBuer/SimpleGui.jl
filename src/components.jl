@@ -1,5 +1,6 @@
 
 include("components/empty.jl")
+export Empty
 
 include("components/row.jl")
 export Row
