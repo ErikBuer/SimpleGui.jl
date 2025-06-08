@@ -18,14 +18,15 @@ struct ContainerView <: AbstractView
     child::AbstractView  # Single child view
     style::ContainerStyle
     on_click::Function
+    on_mouse_down::Function
 end
 
 """
 The `Container` is the most basic GUI component that can contain another component.
 It is the most basic building block of the GUI system.
 """
-function Container(child::AbstractView=EmptyView(); style=ContainerStyle(), on_click::Function=() -> nothing)
-    return ContainerView(child, style, on_click)
+function Container(child::AbstractView=EmptyView(); style=ContainerStyle(), on_click::Function=() -> nothing, on_mouse_down::Function=() -> nothing)
+    return ContainerView(child, style, on_click, on_mouse_down)
 end
 
 function apply_layout(view::ContainerView, x::Float32, y::Float32, width::Float32, height::Float32)

@@ -18,15 +18,26 @@ Enum representing the state of a mouse button.
 
 # Shared state for mouse input
 mutable struct MouseState
-    button_state::Dict{MouseButton,ButtonState}  # Tracks the state of each button
-    x::Float64                                    # Mouse X position
-    y::Float64                                    # Mouse Y position
-    last_click_time::Float64                      # Time of the last click
-    last_click_position::Tuple{Float64,Float64}  # Position of the last click
+    button_state::Dict{MouseButton,ButtonState}  # Current button state
+    was_clicked::Dict{MouseButton,Bool}         # Tracks if the button was clicked
+    x::Float64                                   # Current mouse X position
+    y::Float64                                   # Current mouse Y position
+    last_click_time::Float64                     # Time of the last click
+    last_click_position::Tuple{Float64,Float64} # Position of the last click
 end
 
-function mouse_button_callback(gl_window, button::GLFW.MouseButton, action::GLFW.Action, mods, mouse_state::MouseState)
-    # Map GLFW.MouseButton to MouseButton
+function MouseState()
+    return MouseState(
+        Dict(LeftButton => IsReleased, RightButton => IsReleased, MiddleButton => IsReleased),
+        Dict(LeftButton => false, RightButton => false, MiddleButton => false),
+        0.0,
+        0.0,
+        0.0,
+        (0.0, 0.0)
+    )
+end
+
+function mouse_button_callback(gl_window, button, action, mods, mouse_state::MouseState)
     mapped_button = if button == GLFW.MOUSE_BUTTON_LEFT
         LeftButton
     elseif button == GLFW.MOUSE_BUTTON_RIGHT
@@ -37,11 +48,30 @@ function mouse_button_callback(gl_window, button::GLFW.MouseButton, action::GLFW
         return  # Ignore unsupported buttons
     end
 
-    if action == GLFW.PRESS || action == GLFW.RELEASE
-        mouse_state.button_state[mapped_button] = (action == GLFW.PRESS) ? IsPressed : IsReleased
-        mouse_state.last_click_position = Tuple(GLFW.GetCursorPos(gl_window))  # Convert NamedTuple to Tuple
-        mouse_state.last_click_time = time()  # Use Julia's `time()` function
+    if action == GLFW.PRESS
+        mouse_state.button_state[mapped_button] = IsPressed
+    elseif action == GLFW.RELEASE
+        mouse_state.button_state[mapped_button] = IsReleased
+        mouse_state.was_clicked[mapped_button] = true  # Mark as clicked
+    end
+end
+
+
+function collect_state!(mouse_state::MouseState)::MouseState
+    # Create a copy of the MouseState
+    locked_state = MouseState(
+        deepcopy(mouse_state.button_state),
+        deepcopy(mouse_state.was_clicked),
+        mouse_state.x,
+        mouse_state.y,
+        mouse_state.last_click_time,
+        mouse_state.last_click_position
+    )
+
+    # Reset `was_clicked` in the original state
+    for button in keys(mouse_state.was_clicked)
+        mouse_state.was_clicked[button] = false
     end
 
-    #TODO handle double-click detection
+    return locked_state
 end
