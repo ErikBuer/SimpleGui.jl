@@ -16,3 +16,6 @@ export Text
 
 include("components/image.jl")
 export Image
+
+include("components/horizontal_slider.jl")
+export HorizontalSlider
