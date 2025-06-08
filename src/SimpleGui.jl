@@ -37,12 +37,12 @@ include("test_utilitites.jl")
 
 
 """
-    run(root_view::AbstractView; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
+    run(ui_ref[]::AbstractView; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
 
 Run the main loop for the GUI application.
 This function handles the rendering and event processing for the GUI.
 """
-function run(root_view::AbstractView; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
+function run(ui_ref::Ref{AbstractView}; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
     # Initialize the GLFW window
     gl_window = GLFW.Window(name=title, resolution=(window_width_px, window_height_px))
     GLA.set_context!(gl_window)
@@ -55,7 +55,7 @@ function run(root_view::AbstractView; title::String="SimpleGUI", window_width_px
     initialize_shaders()
 
     # Load textures for all ImageView components
-    load_textures(root_view)
+    load_textures(ui_ref[])
 
     # Initialize local states
     mouse_state = MouseState()
@@ -80,10 +80,10 @@ function run(root_view::AbstractView; title::String="SimpleGUI", window_width_px
 
         # Lock the mouse state by creating a copy
         locked_state = collect_state!(mouse_state)
-        detect_click(root_view, locked_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
+        detect_click(ui_ref[], locked_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
 
         # Render the UI
-        interpret_view(root_view, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px), projection_matrix)
+        interpret_view(ui_ref[], 0.0f0, 0.0f0, Float32(width_px), Float32(height_px), projection_matrix)
 
         # Swap buffers and poll events
         GLFW.SwapBuffers(gl_window)
