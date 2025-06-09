@@ -4,8 +4,7 @@ using SimpleGui: Text
 function main()
     # Mutable state variable
     showImage = Ref(true)
-
-    ui = Ref{AbstractView}(Empty())
+    slider_value = Ref(0.5f0)
 
     function MyApp()
         Row([
@@ -16,25 +15,20 @@ function main()
                 else
                     Text("Click to show image")
                 end,
-                on_click=() -> (
-                    println("Toggling image visibility...");
-                    showImage[] = !showImage[];  # Update state
-                    ui[] = MyApp()               # Update the UI reference
-                )
+                on_click=() -> (showImage[] = !showImage[])
             ),
             Column([
                     Container(),
-                    Container(HorizontalSlider(0.0f0, 100.0f0, 50.0f0; on_change=(value) -> println("Slider value: $value"))),
+                    Container(HorizontalSlider(slider_value[], 1.0f0, 0.0f0; on_change=(value) -> (slider_value[] = value))),
                     Container(Container(on_click=() -> println("Clicked")))],
                 padding=0
             )
         ])
     end
 
-    ui[] = MyApp()
-
     # Run the GUI
-    SimpleGui.run(ui, title="Dynamic UI Example")
+    SimpleGui.run(MyApp, title="Dynamic UI Example")
+    #screenshot(MyApp, "test/test_output/dynamic_ui_example.png", 1920, 1080)
 end
 
 main()

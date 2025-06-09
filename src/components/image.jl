@@ -1,5 +1,4 @@
-mutable struct ImageView <: AbstractView
-    image_path::String  # Path to the image file
+struct ImageView <: AbstractView
     horizontal_align::Symbol  # :left, :center, :right
     vertical_align::Symbol    # :top, :middle, :bottom
     width_px::Union{Nothing,Float32}  # Optional hardcoded width
@@ -12,7 +11,8 @@ function Image(image_path::String;
     vertical_align=:middle,
     width_px::Union{Nothing,Float32}=nothing,
     height_px::Union{Nothing,Float32}=nothing)
-    return ImageView(image_path, horizontal_align, vertical_align, width_px, height_px, nothing)
+    texture = load_image_texture(image_path)
+    return ImageView(horizontal_align, vertical_align, width_px, height_px, texture)
 end
 
 function apply_layout(view::ImageView, x::Float32, y::Float32, width::Float32, height::Float32)
