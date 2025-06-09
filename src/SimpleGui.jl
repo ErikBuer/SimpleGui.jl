@@ -81,9 +81,6 @@ function run(ui_function::Function; title::String="SimpleGUI", window_width_px::
         # Generate the UI dynamically
         ui = ui_function()
 
-        # Load textures for all ImageView components
-        load_textures(ui)
-
         # Detect clicks
         detect_click(ui, locked_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
 

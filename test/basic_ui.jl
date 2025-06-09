@@ -21,7 +21,7 @@ function main()
             ),
             Column([
                     Container(),
-                    Container(HorizontalSlider(0.0f0, 100.0f0, 50.0f0; on_change=(value) -> println("Slider value: $value"))),
+                    Container(HorizontalSlider(0.0f0, 100.0f0, 50.0f0; on_change=(value) -> ())),
                     Container(Container(on_click=() -> println("Clicked")))],
                 padding=0
             )
