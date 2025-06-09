@@ -27,6 +27,7 @@ makedocs(
         "Components"=>Any[
             "Components/container.md",
             "Components/layout.md",
+            "Components/text.md",
             "Components/slider.md",
         ],
         "api_reference.md",

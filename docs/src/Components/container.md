@@ -15,7 +15,7 @@ nothing #hide
 
 ![Container](container.png)
 
-You can add a child component to a cointainer, as such
+You can add a child component to a cointainer, as such:
 
 ``` @example HorizontalSliderExample2
 using Element
