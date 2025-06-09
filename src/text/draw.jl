@@ -1,6 +1,6 @@
 function draw_text(
     font_face::FreeTypeAbstraction.FTFont,
-    text::String,
+    text::AbstractString,
     x_px::Float32,
     y_px::Float32,
     pixelsize::Int,
