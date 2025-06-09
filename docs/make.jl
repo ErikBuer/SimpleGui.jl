@@ -30,6 +30,7 @@ makedocs(
             "Components/text.md",
             "Components/slider.md",
         ],
+        "interaction.md",
         "api_reference.md",
     ],
     doctest=true,

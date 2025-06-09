@@ -2,7 +2,7 @@
 
 The most basic UI component.
 
-``` @example HorizontalSliderExample
+``` @example ContainerExample
 using Element
 
 function MyApp()
@@ -17,11 +17,13 @@ nothing #hide
 
 You can add a child component to a cointainer, as such:
 
-``` @example HorizontalSliderExample2
+``` @example ContainerExample2
 using Element
 
 function MyApp()
-    Container(Container())
+    Container(
+        Container()
+    )
 end
 
 screenshot(MyApp, "container_child.png", 400, 300);
