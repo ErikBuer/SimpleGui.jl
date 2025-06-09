@@ -21,7 +21,7 @@ function create_offscreen_framebuffer(width::Int, height::Int)
     return framebuffer[], texture[]
 end
 
-function save_screenshot_offscreen(ui_funciton::Function, output_file::String, width::Int, height::Int)
+function screenshot(ui_funciton::Function, output_file::String, width::Int, height::Int)
 
     # Initialize GLFW window (offscreen context)
     gl_window = GLFW.Window(name="Offscreen", resolution=(width, height))

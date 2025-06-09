@@ -17,7 +17,7 @@ function MyApp()
     )
 end
 
-SimpleGui.save_screenshot_offscreen(MyApp, "horizontal_slider.png", 400, 100);
+screenshot(MyApp, "horizontal_slider.png", 400, 100);
 nothing #hide
 ```
 

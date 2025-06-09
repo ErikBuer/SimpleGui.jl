@@ -34,6 +34,7 @@ include("gui_component/draw.jl")
 include("components.jl")
 
 include("test_utilitites.jl")
+export screenshot
 
 
 """

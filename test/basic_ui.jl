@@ -28,7 +28,7 @@ function main()
 
     # Run the GUI
     SimpleGui.run(MyApp, title="Dynamic UI Example")
-    #SimpleGui.save_screenshot_offscreen(MyApp, "test/test_output/dynamic_ui_example.png", 1920, 1080)
+    #screenshot(MyApp, "test/test_output/dynamic_ui_example.png", 1920, 1080)
 end
 
 main()
