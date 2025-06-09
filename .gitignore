@@ -24,3 +24,5 @@ docs/site/
 Manifest.toml
 
 test/test_output/
+
+*.DS_Store
