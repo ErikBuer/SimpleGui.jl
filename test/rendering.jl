@@ -13,10 +13,19 @@ using TestItems
         ])
     end
 
-    ui = MyApp()
+    # Save a screenshot of the UI
+    Element.screenshot(MyApp, "test_output/ui_screenshot.png", 400, 300)
+end
+
+@testitem "Test Text" begin
+    function MyApp()
+        Container(
+            Text("Some text", color=RGB(0.0, 0.0, 0.0), font_size=24)
+        )
+    end
 
     # Save a screenshot of the UI
-    Element.save_screenshot_offscreen(ui, "test_output/ui_screenshot.png", 400, 300)
+    Element.screenshot(MyApp, "test_output/text_screenshot.png", 400, 300)
 end
 
 

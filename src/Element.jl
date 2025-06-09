@@ -19,6 +19,7 @@ export mouse_state, mouse_button_callback, MouseState
 include("abstract_view.jl")
 export AbstractView
 
+include("text/font_cache.jl")
 include("text/utilities.jl")
 include("text/text_style.jl")
 export TextStyle
