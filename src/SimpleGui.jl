@@ -42,7 +42,7 @@ include("test_utilitites.jl")
 Run the main loop for the GUI application.
 This function handles the rendering and event processing for the GUI.
 """
-function run(ui_ref::Ref{AbstractView}; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
+function run(ui_function::Function; title::String="SimpleGUI", window_width_px::Integer=1920, window_height_px::Integer=1080)
     # Initialize the GLFW window
     gl_window = GLFW.Window(name=title, resolution=(window_width_px, window_height_px))
     GLA.set_context!(gl_window)
@@ -53,9 +53,6 @@ function run(ui_ref::Ref{AbstractView}; title::String="SimpleGUI", window_width_
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     initialize_shaders()
-
-    # Load textures for all ImageView components
-    load_textures(ui_ref[])
 
     # Initialize local states
     mouse_state = MouseState()
@@ -80,10 +77,18 @@ function run(ui_ref::Ref{AbstractView}; title::String="SimpleGUI", window_width_
 
         # Lock the mouse state by creating a copy
         locked_state = collect_state!(mouse_state)
-        detect_click(ui_ref[], locked_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
+
+        # Generate the UI dynamically
+        ui = ui_function()
+
+        # Load textures for all ImageView components
+        load_textures(ui)
+
+        # Detect clicks
+        detect_click(ui, locked_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
 
         # Render the UI
-        interpret_view(ui_ref[], 0.0f0, 0.0f0, Float32(width_px), Float32(height_px), projection_matrix)
+        interpret_view(ui, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px), projection_matrix)
 
         # Swap buffers and poll events
         GLFW.SwapBuffers(gl_window)

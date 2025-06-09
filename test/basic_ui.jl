@@ -5,8 +5,6 @@ function main()
     # Mutable state variable
     showImage = Ref(true)
 
-    ui = Ref{AbstractView}(Empty())
-
     function MyApp()
         Row([
             Container(Text("Hello World")),
@@ -18,8 +16,7 @@ function main()
                 end,
                 on_click=() -> (
                     println("Toggling image visibility...");
-                    showImage[] = !showImage[];  # Update state
-                    ui[] = MyApp()               # Update the UI reference
+                    showImage[] = !showImage[]  # Update state
                 )
             ),
             Column([
@@ -31,10 +28,8 @@ function main()
         ])
     end
 
-    ui[] = MyApp()
-
     # Run the GUI
-    SimpleGui.run(ui, title="Dynamic UI Example")
+    SimpleGui.run(MyApp, title="Dynamic UI Example")
 end
 
 main()
