@@ -2,9 +2,8 @@
 
 using Pkg
 Pkg.activate("docs/")
-Pkg.instantiate()
-
 Pkg.develop(path=".")
+Pkg.instantiate()
 
 ENV["LOCAL"] = "true"
 

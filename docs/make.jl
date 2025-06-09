@@ -25,8 +25,13 @@ makedocs(
     pages=Any[
         "index.md",
         "Components"=>Any[
+            "Components/container.md",
+            "Components/layout.md",
+            "Components/text.md",
+            "Components/image.md",
             "Components/slider.md",
         ],
+        "interaction.md",
         "api_reference.md",
     ],
     doctest=true,
