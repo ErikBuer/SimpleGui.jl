@@ -22,14 +22,14 @@ function draw_text(
         bitmap_matrix = Float32.(bitmap) ./ 255.0f0  # Normalize to [0.0, 1.0]
 
         # Create a texture from the bitmap
-        texture = SimpleGui.create_text_texture(bitmap_matrix)
+        texture = Element.create_text_texture(bitmap_matrix)
 
         # Calculate the width and height of the glyph
         width_px = Float32(size(bitmap_matrix, 2))  # Glyph width
         height_px = Float32(size(bitmap_matrix, 1)) # Glyph height
 
         # Draw the glyph at the current position
-        SimpleGui.draw_glyph(
+        Element.draw_glyph(
             texture,
             current_x + Float32(extent.horizontal_bearing[1]),  # Adjust for horizontal bearing
             y_px - Float32(extent.horizontal_bearing[2]),       # Adjust for vertical bearing

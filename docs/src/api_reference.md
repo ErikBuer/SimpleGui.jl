@@ -1,5 +1,5 @@
 # API Reference
 
 ```@autodocs
-Modules = [SimpleGui]
+Modules = [Element]
 ```

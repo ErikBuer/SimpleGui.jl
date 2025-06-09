@@ -1,7 +1,7 @@
 # Sliders
 
 ``` @example HorizontalSliderExample
-using SimpleGui
+using Element
 
 # Ref for maintining the slider state
 slider_value = Ref(0.5f0)

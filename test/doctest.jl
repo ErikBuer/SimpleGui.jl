@@ -1,7 +1,7 @@
 using Documenter
-using SimpleGui
+using Element
 
-# Run doctests for SimpleGui.jl
+# Run doctests for Element.jl
 
-DocMeta.setdocmeta!(SimpleGui, :DocTestSetup, :(using SimpleGui); recursive=true)
-Documenter.doctest(SimpleGui)
+DocMeta.setdocmeta!(Element, :DocTestSetup, :(using Element); recursive=true)
+Documenter.doctest(Element)
