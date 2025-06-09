@@ -9,12 +9,23 @@ function draw_text(
 )
     current_x = x_px
 
+    # Initialize prev_char to nothing
+    local prev_char::Union{Char,Nothing} = nothing
+
     for char in text
         # Render the glyph and get its bitmap and extent
         bitmap, extent = FreeTypeAbstraction.renderface(font_face, char, pixelsize)
 
-        # Skip empty glyphs
+        # Handle kerning between characters
+        if prev_char !== nothing
+            kx, _ = map(x -> round(Int, x), FreeTypeAbstraction.kerning(prev_char, char, font_face))
+            current_x += kx
+        end
+
+        # Skip empty glyphs (e.g., spaces may have no bitmap but still have advance width)
         if isempty(bitmap) || size(bitmap, 1) == 0 || size(bitmap, 2) == 0
+            current_x += Float32(extent.advance[1])  # Advance the pen position for spaces
+            prev_char = char
             continue
         end
 
@@ -22,24 +33,18 @@ function draw_text(
         bitmap_matrix = Float32.(bitmap) ./ 255.0f0  # Normalize to [0.0, 1.0]
 
         # Create a texture from the bitmap
-        texture = Element.create_text_texture(bitmap_matrix)
+        texture = create_text_texture(bitmap_matrix)
 
-        # Calculate the width and height of the glyph
-        width_px = Float32(size(bitmap_matrix, 2))  # Glyph width
-        height_px = Float32(size(bitmap_matrix, 1)) # Glyph height
+        # Calculate the glyph's position
+        glyph_x = current_x + Float32(extent.horizontal_bearing[1])
+        glyph_y = y_px - Float32(extent.horizontal_bearing[2])
 
-        # Draw the glyph at the current position
-        Element.draw_glyph(
-            texture,
-            current_x + Float32(extent.horizontal_bearing[1]),  # Adjust for horizontal bearing
-            y_px - Float32(extent.horizontal_bearing[2]),       # Adjust for vertical bearing
-            projection_matrix;
-            scale=1.0,
-            color=color  # Pass the color to draw_glyph
-        )
+        # Render the glyph
+        draw_glyph(texture, glyph_x, glyph_y, projection_matrix; scale=1.0, color=color)
 
-        # Advance the x position by the glyph's advance width
+        # Advance the pen position
         current_x += Float32(extent.advance[1])
+        prev_char = char
     end
 end
 

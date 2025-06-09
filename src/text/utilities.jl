@@ -1,6 +1,6 @@
-function create_text_texture(sdf_matrix::Matrix{Float32})::GLAbstraction.Texture
+function create_text_texture(mat::Matrix{Float32})::GLAbstraction.Texture
     # Create a GLAbstraction.Texture
-    texture = GLA.Texture(sdf_matrix;
+    texture = GLA.Texture(mat;
         minfilter=:linear,
         magfilter=:linear,
         x_repeat=:clamp_to_edge,

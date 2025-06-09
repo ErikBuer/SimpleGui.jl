@@ -29,11 +29,12 @@ function interpret_view(view::TextView, x::Float32, y::Float32, width::Float32, 
     current_width = 0.0f0
 
     for word in words
-        # Measure the width of the word
+        # Measure the width of the word, including a space
         word_width = measure_word_width(font, word, size_px)
+        space_width = measure_word_width(font, " ", size_px)
 
         # Check if the word fits in the current line
-        if current_width + word_width > width
+        if current_width + word_width + space_width > width
             # Move to a new line
             push!(lines, current_line)
             current_line = word
@@ -41,7 +42,7 @@ function interpret_view(view::TextView, x::Float32, y::Float32, width::Float32, 
         else
             # Add the word to the current line
             current_line *= " " * word
-            current_width += word_width
+            current_width += word_width + space_width
         end
     end
 
