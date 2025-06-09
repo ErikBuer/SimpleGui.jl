@@ -22,7 +22,7 @@ mutable struct HorizontalSliderView <: AbstractView
     on_change::Function         # Callback for value changes
 end
 
-function HorizontalSlider(min_value::Real, max_value::Real, current_value::Real; style=SliderStyle(), on_change::Function=() -> nothing)
+function HorizontalSlider(current_value::T, min_value::T, max_value::T; style=SliderStyle(), on_change::Function=() -> nothing) where T<:Real
     return HorizontalSliderView(min_value, max_value, current_value, style, on_change)
 end
 
