@@ -21,8 +21,7 @@ function create_offscreen_framebuffer(width::Int, height::Int)
     return framebuffer[], texture[]
 end
 
-function save_screenshot_offscreen(root_view::AbstractView, output_file::String, width::Int, height::Int)
-    println("Initializing OpenGL context...")
+function save_screenshot_offscreen(ui_funciton::Function, output_file::String, width::Int, height::Int)
 
     # Initialize GLFW window (offscreen context)
     gl_window = GLFW.Window(name="Offscreen", resolution=(width, height))
@@ -34,6 +33,8 @@ function save_screenshot_offscreen(root_view::AbstractView, output_file::String,
     ModernGL.glBlendFunc(ModernGL.GL_SRC_ALPHA, ModernGL.GL_ONE_MINUS_SRC_ALPHA)
 
     initialize_shaders()
+
+    root_view::AbstractView = ui_funciton()
 
     framebuffer, texture = create_offscreen_framebuffer(width, height)
     ModernGL.glBindFramebuffer(ModernGL.GL_FRAMEBUFFER, framebuffer)

@@ -79,7 +79,7 @@ function run(ui_function::Function; title::String="SimpleGUI", window_width_px::
         locked_state = collect_state!(mouse_state)
 
         # Generate the UI dynamically
-        ui = ui_function()
+        ui::AbstractView = ui_function()
 
         # Detect clicks
         detect_click(ui, locked_state, 0.0f0, 0.0f0, Float32(width_px), Float32(height_px))
