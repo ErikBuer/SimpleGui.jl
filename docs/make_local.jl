@@ -2,6 +2,7 @@
 
 using Pkg
 Pkg.activate("docs/")
+Pkg.develop(path=".")
 Pkg.instantiate()
 
 Pkg.develop(path=".")

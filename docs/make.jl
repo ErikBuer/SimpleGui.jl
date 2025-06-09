@@ -25,6 +25,8 @@ makedocs(
     pages=Any[
         "index.md",
         "Components"=>Any[
+            "Components/container.md",
+            "Components/layout.md",
             "Components/slider.md",
         ],
         "api_reference.md",
