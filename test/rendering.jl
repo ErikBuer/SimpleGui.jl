@@ -1,4 +1,4 @@
-using SimpleGui
+using Element
 using ColorTypes
 
 using TestItems
@@ -16,12 +16,12 @@ using TestItems
     ui = MyApp()
 
     # Save a screenshot of the UI
-    SimpleGui.save_screenshot_offscreen(ui, "test_output/ui_screenshot.png", 400, 300)
+    Element.save_screenshot_offscreen(ui, "test_output/ui_screenshot.png", 400, 300)
 end
 
 
 @testitem "Test orthographic Projection Matrix" begin
-    projection_matrix = SimpleGui.get_orthographic_matrix(0.0, 1920.0, 1080.0, 0.0, -1.0, 1.0)
+    projection_matrix = Element.get_orthographic_matrix(0.0, 1920.0, 1080.0, 0.0, -1.0, 1.0)
 
     vertex1 = Float32[0.0, 0.0, 0.0, 1.0]
 

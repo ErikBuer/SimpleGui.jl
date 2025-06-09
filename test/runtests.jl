@@ -1,5 +1,5 @@
 using Test
-using SimpleGui
+using Element
 
 
 include("doctest.jl")

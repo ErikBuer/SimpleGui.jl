@@ -1,5 +1,5 @@
-using SimpleGui
-using SimpleGui: Text
+using Element
+using Element: Text
 
 function main()
     # Mutable state variable
@@ -27,7 +27,7 @@ function main()
     end
 
     # Run the GUI
-    SimpleGui.run(MyApp, title="Dynamic UI Example")
+    Element.run(MyApp, title="Dynamic UI Example")
     #screenshot(MyApp, "test/test_output/dynamic_ui_example.png", 1920, 1080)
 end
 

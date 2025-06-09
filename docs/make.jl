@@ -8,20 +8,20 @@ using Documenter
 const LOCAL = get(ENV, "LOCAL", "false") == "true"
 
 if LOCAL
-    include("../src/SimpleGui.jl")
-    using .SimpleGui
+    include("../src/Element.jl")
+    using .Element
 else
-    using SimpleGui
+    using Element
     ENV["GKSwstype"] = "100"
 end
 
-DocMeta.setdocmeta!(SimpleGui, :DocTestSetup, :(using SimpleGui); recursive=true)
+DocMeta.setdocmeta!(Element, :DocTestSetup, :(using Element); recursive=true)
 
 
 makedocs(
-    modules=[SimpleGui],
+    modules=[Element],
     format=Documenter.HTML(),
-    sitename="SimpleGui.jl",
+    sitename="Element.jl",
     pages=Any[
         "index.md",
         "Components"=>Any[
@@ -33,6 +33,6 @@ makedocs(
 )
 
 deploydocs(
-    repo="github.com/ErikBuer/SimpleGui.jl.git",
+    repo="github.com/ErikBuer/Element.jl.git",
     push_preview=true,
 )
