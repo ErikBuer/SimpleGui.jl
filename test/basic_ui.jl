@@ -22,7 +22,12 @@ function main()
                     ui[] = MyApp()               # Update the UI reference
                 )
             ),
-            Column([Container(), Container(), Container(Container(on_click=() -> println("Clicked")))], padding=0)
+            Column([
+                    Container(),
+                    Container(HorizontalSlider(0.0f0, 100.0f0, 50.0f0; on_change=(value) -> println("Slider value: $value"))),
+                    Container(Container(on_click=() -> println("Clicked")))],
+                padding=0
+            )
         ])
     end
 
