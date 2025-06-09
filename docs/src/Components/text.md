@@ -14,9 +14,13 @@ screenshot(MyApp, "text.png", 400, 150);
 nothing #hide
 ```
 
+## Wrapping
+
+The `Text` component support wrapping by default.
+
 ![Text](text.png)
 
-``` @example WrappingExample
+``` @example TextWrappingExample
 using Element
 using Element: Text
 
@@ -31,3 +35,47 @@ nothing #hide
 ```
 
 ![Text wrapping](text_wrap.png)
+
+## Horizontal Alignement
+
+``` @example TextAlignement
+using Element
+using Element: Text
+
+function MyApp()
+    Container(
+        Column([
+            Text("Align left",   horizontal_align=:left), 
+            Text("Align center", horizontal_align=:center), 
+            Text("Align right",  horizontal_align=:right)
+        ])
+    )
+end
+
+screenshot(MyApp, "text_align.png", 400, 150);
+nothing #hide
+```
+
+![Text horizontal alignement](text_align.png)
+
+## Vertical Alignement
+
+``` @example TextVerticalAlignment
+using Element
+using Element: Text
+
+function MyApp()
+    Container(
+        Column([
+            Text("Align top",    vertical_align=:top), 
+            Text("Align middle", vertical_align=:middle), 
+            Text("Align bottom", vertical_align=:bottom)
+        ])
+    )
+end
+
+screenshot(MyApp, "text_vertical_align.png", 400, 150);
+nothing #hide
+```
+
+![Text vertical alignment](text_vertical_align.png)
